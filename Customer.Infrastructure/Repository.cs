@@ -8,9 +8,9 @@ namespace Costumer.Infrastructure
 {
     public class Repository : IRepository
     {
-        private readonly IConsumer<Guid, string> _consumer;
+        private readonly IConsumer<string, string> _consumer;
         private readonly IConfiguration _configuration;
-        private readonly IProducer<Guid, string> _producer;
+        private readonly IProducer<string, string> _producer;
 
         public Repository(IConfiguration configuration)
         {
@@ -19,16 +19,16 @@ namespace Costumer.Infrastructure
             var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = _configuration["Kafka:BootstrapServers"],
-                GroupId = _configuration["Consumer:GroupId"],
+                GroupId = _configuration["Groups:CvrGroup"],
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
-            _consumer = new ConsumerBuilder<Guid, string>(consumerConfig).Build();
+            _consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
         }
 
         void IRepository.ReadCvr(ReadCvrDto dto)
         {
-            string topic = _configuration["KafkaTopics:mssql-Cvr"];
+            string topic = _configuration["KafkaTopics:Cvr"];
             var partition = new TopicPartition(topic, 0);
             _consumer.Assign(new TopicPartitionOffset(partition, Offset.Beginning));
 
@@ -39,7 +39,7 @@ namespace Costumer.Infrastructure
                 if (message == null)
                 {
                     dto.State = "CvrDenied";
-                    _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<Guid, string>
+                    _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
                     {
                         Key = dto.Id,
                         Value = JsonConvert.SerializeObject(dto)
@@ -53,7 +53,7 @@ namespace Costumer.Infrastructure
                 if (dto.Cvr == payloadWrapper.Payload.Cvr)
                 {
                     dto.State = "CvrApproved";
-                    _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<Guid, string>
+                    _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
                     {
                         Key = dto.Id,
                         Value = JsonConvert.SerializeObject(dto)

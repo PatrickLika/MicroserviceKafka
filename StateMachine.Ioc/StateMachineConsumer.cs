@@ -10,11 +10,12 @@ namespace StateMachine.Ioc
         private readonly IProducer<string, string> _producer;
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
-        public StateMachineConsumer(IConsumer<string, string> consumer, IProducer<string, string> producer, IConfiguration configuration)
+        public StateMachineConsumer(IConsumer<string, string> consumer, IProducer<string, string> producer, IConfiguration configuration, HttpClient httpClient)
         {
             _consumer = consumer;
             _producer = producer;
             _configuration = configuration;
+            _httpClient = httpClient;
         }
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
@@ -36,12 +37,15 @@ namespace StateMachine.Ioc
             {
                 var message = _consumer.Consume(cancellationToken);
 
-                // KAFKA SYNTAX
-                string query = $"SELECT AS_JSON(OrderReplyChannel) AS JsonData FROM OrderReplyChannel WHERE KeyField = '{message.Message.Key}';";
-                var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
-                HttpResponseMessage response = await _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var dto = JsonConvert.DeserializeObject<StateMachineDto>(responseContent);
+                //// KAFKA SYNTAX
+                //string query = $"SELECT * FROM QUERYABLE_ORDERS WHERE OrderId = '{message.Message.Key}';";
+                //var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
+                //HttpResponseMessage response = await _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content);
+                //var responseContent = await response.Content.ReadAsStringAsync();
+
+
+
+                var dto = JsonConvert.DeserializeObject<StateMachineDto>(message.Message.Value);
 
 
                 if (dto.State == "OrderPending")
@@ -49,14 +53,10 @@ namespace StateMachine.Ioc
                     dto.State = "CostumerPending";
 
 
-                    await _producer.ProduceAsync(_configuration["KafkaTopics:Costumer"], new Message<string, string>
+                    await _producer.ProduceAsync(_configuration["KafkaTopics:Customer"], new Message<string, string>
                     {
                         Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(new StateMachineDto
-                        {
-                            Cvr = dto.Cvr,
-                            State = dto.State
-                        })
+                        Value = JsonConvert.SerializeObject(dto)
                     });
                     _producer.Flush();
                 }
@@ -67,13 +67,7 @@ namespace StateMachine.Ioc
                     await _producer.ProduceAsync(_configuration["KafkaTopics:Storage"], new Message<string, string>
                     {
                         Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(new StateMachineDto
-                        {
-                            Bolts = dto.Bolts,
-                            Nails = dto.Nails,
-                            Screws = dto.Screws,
-                            State = dto.State
-                        })
+                        Value = JsonConvert.SerializeObject(dto)
                     });
                     _producer.Flush();
                 }
@@ -84,11 +78,7 @@ namespace StateMachine.Ioc
                     await _producer.ProduceAsync(_configuration["KafkaTopics:Payment"], new Message<string, string>
                     {
                         Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(new StateMachineDto
-                        {
-                            Price = dto.Price,
-                            State = dto.State
-                        })
+                        Value = JsonConvert.SerializeObject(dto)
                     });
                     _producer.Flush();
                 }
@@ -99,16 +89,7 @@ namespace StateMachine.Ioc
                     await _producer.ProduceAsync(_configuration["KafkaTopics:Receipt"], new Message<string, string>
                     {
                         Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(new StateMachineDto
-                        {
-                            Cvr = dto.Cvr,
-                            Bolts = dto.Bolts,
-                            Nails = dto.Nails,
-                            Screws = dto.Screws,
-                            Price = dto.Price,
-                            State = dto.State
-
-                        })
+                        Value = JsonConvert.SerializeObject(dto)
                     });
                     _producer.Flush();
                 }
@@ -119,10 +100,7 @@ namespace StateMachine.Ioc
                     await _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
                     {
                         Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(new StateMachineDto
-                        {
-                            State = dto.State
-                        })
+                        Value = JsonConvert.SerializeObject(dto)
                     });
                     _producer.Flush();
                 }
@@ -134,10 +112,7 @@ namespace StateMachine.Ioc
                     await _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
                     {
                         Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(new StateMachineDto
-                        {
-                            State = dto.State
-                        })
+                        Value = JsonConvert.SerializeObject(dto)
                     });
                     _producer.Flush();
                 }

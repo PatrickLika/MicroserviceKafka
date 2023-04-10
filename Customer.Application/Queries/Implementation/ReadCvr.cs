@@ -1,4 +1,5 @@
 ﻿using Costumer.Application.Repository;
+using Customer.Application.Queries;
 
 namespace Costumer.Application.Queries.Implementation
 {
@@ -10,9 +11,9 @@ namespace Costumer.Application.Queries.Implementation
             _repository = repository;
         }
 
-        void IReadCvr.ReadCvr(string cvr)
+        void IReadCvr.ReadCvr(ReadCvrDto dto)
         {
-            _repository.ReadCvr(cvr);
+            _repository.ReadCvr(dto);
         }
     }
 }

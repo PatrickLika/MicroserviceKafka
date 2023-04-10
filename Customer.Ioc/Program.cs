@@ -12,7 +12,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddScoped<IReadCvr, ReadCvr>();
 
 
-        services.AddScoped<IConsumer<Guid, string>>(provider =>
+        services.AddScoped<IConsumer<string, string>>(provider =>
         {
             var config = new ConsumerConfig
             {
@@ -21,7 +21,7 @@ var host = Host.CreateDefaultBuilder(args)
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
-            return new ConsumerBuilder<Guid, string>(config).Build();
+            return new ConsumerBuilder<string, string>(config).Build();
         });
 
 

@@ -7,11 +7,11 @@ namespace Costumer.Ioc
 {
     public class CostumerConsumer : IHostedService
     {
-        private readonly IConsumer<Guid, string> _consumer;
+        private readonly IConsumer<string, string> _consumer;
         private readonly IReadCvr _iReadCvr;
         private readonly IConfiguration _configuration;
 
-        public CostumerConsumer(IConsumer<Guid, string> consumer, IReadCvr iReadCvr)
+        public CostumerConsumer(IConsumer<string, string> consumer, IReadCvr iReadCvr)
         {
             _consumer = consumer;
             _iReadCvr = iReadCvr;
@@ -19,7 +19,7 @@ namespace Costumer.Ioc
 
         async Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe(_configuration["Costumer"]);
+            _consumer.Subscribe("Customer");
 
             while (!cancellationToken.IsCancellationRequested)
             {
