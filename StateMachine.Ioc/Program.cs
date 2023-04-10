@@ -1,6 +1,34 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using Confluent.Kafka;
+using StateMachine.Ioc;
 
-app.MapGet("/", () => "Hello World!");
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices((hostContext, services) =>
+    {
 
-app.Run();
+        services.AddScoped<IProducer<string, string>>(provider =>
+        {
+            var config = new ProducerConfig
+            {
+                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]
+            };
+            return new ProducerBuilder<string, string>(config).Build();
+        });
+
+        services.AddScoped<IConsumer<string, string>>(provider =>
+        {
+            var config = new ConsumerConfig
+            {
+                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
+                GroupId = hostContext.Configuration["Groups:CustomerGroup"],
+                AutoOffsetReset = AutoOffsetReset.Earliest
+            };
+
+            return new ConsumerBuilder<string, string>(config).Build();
+        });
+
+        services.AddHostedService<StateMachineConsumer>();
+
+    })
+    .Build();
+
+host.Run();
