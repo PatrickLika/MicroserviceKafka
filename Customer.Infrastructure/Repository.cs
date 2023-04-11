@@ -12,9 +12,11 @@ namespace Costumer.Infrastructure
         private readonly IConfiguration _configuration;
         private readonly IProducer<string, string> _producer;
 
-        public Repository(IConfiguration configuration)
+        public Repository(IConfiguration configuration, IProducer<string, string> producer, IConsumer<string,string> consumer)
         {
             _configuration = configuration;
+            _producer = producer;
+            _consumer = consumer;
 
             var consumerConfig = new ConsumerConfig
             {
@@ -52,7 +54,7 @@ namespace Costumer.Infrastructure
 
                 if (dto.Cvr == payloadWrapper.Payload.Cvr)
                 {
-                    dto.State = "CvrApproved";
+                    dto.State = "CustomerApproved";
                     _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
                     {
                         Key = dto.Id,

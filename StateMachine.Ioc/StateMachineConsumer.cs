@@ -9,13 +9,12 @@ namespace StateMachine.Ioc
         private readonly IConsumer<string, string> _consumer;
         private readonly IProducer<string, string> _producer;
         private readonly IConfiguration _configuration;
-        private readonly HttpClient _httpClient;
-        public StateMachineConsumer(IConsumer<string, string> consumer, IProducer<string, string> producer, IConfiguration configuration, HttpClient httpClient)
+       
+        public StateMachineConsumer(IConsumer<string, string> consumer, IProducer<string, string> producer, IConfiguration configuration)
         {
             _consumer = consumer;
             _producer = producer;
             _configuration = configuration;
-            _httpClient = httpClient;
         }
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {

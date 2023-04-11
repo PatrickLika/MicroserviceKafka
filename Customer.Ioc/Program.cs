@@ -11,6 +11,15 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddScoped<IRepository, Repository>();
         services.AddScoped<IReadCvr, ReadCvr>();
 
+        services.AddScoped<IProducer<string, string>>(provider =>
+        {
+            var config = new ProducerConfig
+            {
+                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]
+            };
+
+            return new ProducerBuilder<string, string>(config).Build();
+        });
 
         services.AddScoped<IConsumer<string, string>>(provider =>
         {

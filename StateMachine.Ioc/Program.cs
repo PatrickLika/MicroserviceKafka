@@ -4,7 +4,6 @@ using StateMachine.Ioc;
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddHttpClient();
         services.AddScoped<IProducer<string, string>>(provider =>
         {
             var config = new ProducerConfig
