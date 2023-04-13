@@ -19,12 +19,22 @@ namespace Storage.Domain.Model
             Nails = nails;
             State = state;
             _domainService = domainService;
+
+
+        }
+        private async Task IsInStorageAsync()
+        {
+            if (await _domainService.IsInStorage(Screws, Bolts, Nails))
+            {
+                State = "StorageApproved";
+            }
+            else
+            {
+                State = "StorageDenied";
+            }
         }
 
-        private Task<StorageEntity> IsInStorage()
-        {
-            return _domainService.GetStorageInformation();
-        }
+
 
     }
 }

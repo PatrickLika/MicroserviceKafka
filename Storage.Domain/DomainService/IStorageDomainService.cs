@@ -4,6 +4,6 @@ namespace Storage.Domain.DomainService
 {
     public interface IStorageDomainService
     {
-        Task<StorageEntity> GetStorageInformation();
+        Task<bool> IsInStorage(int screws, int bolts, int nails);
     }
 }
