@@ -18,7 +18,6 @@ namespace Storage.Infrastructure.DomainService
 
         async Task<bool> IStorageDomainService.IsInStorage(int screws, int bolts, int nails)
         {
-
             string query = $"SELECT * FROM QUERYABLE_Storage;";
             var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
             HttpResponseMessage response = await _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content);
@@ -29,7 +28,6 @@ namespace Storage.Infrastructure.DomainService
             if (payload.Payload.Screws >= screws && payload.Payload.Bolts >= bolts && payload.Payload.Nails >= nails) return true;
 
             else return false;
-
         }
 
         private class PayloadWrapper
