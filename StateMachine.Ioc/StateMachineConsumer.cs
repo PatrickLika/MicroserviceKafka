@@ -1,6 +1,5 @@
 ﻿using Confluent.Kafka;
 using Newtonsoft.Json;
-using System.Text;
 
 namespace StateMachine.Ioc
 {
@@ -9,7 +8,7 @@ namespace StateMachine.Ioc
         private readonly IConsumer<string, string> _consumer;
         private readonly IProducer<string, string> _producer;
         private readonly IConfiguration _configuration;
-       
+
         public StateMachineConsumer(IConsumer<string, string> consumer, IProducer<string, string> producer, IConfiguration configuration)
         {
             _consumer = consumer;
@@ -35,89 +34,52 @@ namespace StateMachine.Ioc
             while (!cancellationToken.IsCancellationRequested)
             {
                 var message = _consumer.Consume(cancellationToken);
-
-                //// KAFKA SYNTAX
-                //string query = $"SELECT * FROM QUERYABLE_ORDERS WHERE OrderId = '{message.Message.Key}';";
-                //var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
-                //HttpResponseMessage response = await _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content);
-                //var responseContent = await response.Content.ReadAsStringAsync();
-
-
-
                 var dto = JsonConvert.DeserializeObject<StateMachineDto>(message.Message.Value);
 
-
-                if (dto.State == "OrderPending")
+                switch (dto.State)
                 {
-                    dto.State = "CostumerPending";
+                    case States.OrderPending:
+                        dto.State = States.CustomerPending;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:Customer"], message.Message.Key, dto);
+                        break;
 
+                    case States.CustomerApproved:
+                        dto.State = States.StoragePending;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        break;
 
-                    await _producer.ProduceAsync(_configuration["KafkaTopics:Customer"], new Message<string, string>
-                    {
-                        Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(dto)
-                    });
-                    _producer.Flush();
+                    case States.StorageApproved:
+                        dto.State = States.PaymentPending;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:Payment"], message.Message.Key, dto);
+                        break;
+
+                    case States.PaymentApproved:
+                        dto.State = States.ReceiptPending;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:Receipt"], message.Message.Key, dto);
+                        break;
+
+                    case States.ReceiptDone:
+                        dto.State = States.OrderApproved;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
+                        break;
+
+                    case States.OrderApproved:
+                        dto.State = States.OrderSuccessful;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
+                        break;
                 }
-
-                if (dto.State == "CostumerApproved")
-                {
-                    dto.State = "StoragePending";
-                    await _producer.ProduceAsync(_configuration["KafkaTopics:Storage"], new Message<string, string>
-                    {
-                        Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(dto)
-                    });
-                    _producer.Flush();
-                }
-
-                if (dto.State == "StorageApproved")
-                {
-                    dto.State = "PaymentPending";
-                    await _producer.ProduceAsync(_configuration["KafkaTopics:Payment"], new Message<string, string>
-                    {
-                        Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(dto)
-                    });
-                    _producer.Flush();
-                }
-
-                if (dto.State == "PaymentApproved")
-                {
-                    dto.State = "ReceiptPending";
-                    await _producer.ProduceAsync(_configuration["KafkaTopics:Receipt"], new Message<string, string>
-                    {
-                        Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(dto)
-                    });
-                    _producer.Flush();
-                }
-
-                if (dto.State == "RecieptDone")
-                {
-                    dto.State = "OrderApproved";
-                    await _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
-                    {
-                        Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(dto)
-                    });
-                    _producer.Flush();
-                }
-
-                if (dto.State == "OrderApproved")
-                {
-                    dto.State = "OrderSuccessful";
-
-                    await _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
-                    {
-                        Key = message.Message.Key,
-                        Value = JsonConvert.SerializeObject(dto)
-                    });
-                    _producer.Flush();
-                }
-
             }
-
         }
+
+        private async Task ProduceMessageAsync(string topic, string key, StateMachineDto dto)
+        {
+            await _producer.ProduceAsync(topic, new Message<string, string>
+            {
+                Key = key,
+                Value = JsonConvert.SerializeObject(dto)
+            });
+            _producer.Flush();
+        }
+
     }
 }

@@ -19,11 +19,13 @@ namespace Storage.Domain.Model
             Nails = nails;
             State = state;
             _domainService = domainService;
+            
+            
         }
 
-        private Task<StorageEntity> IsInStorage()
+        private bool IsInStorage()
         {
-            return _domainService.GetStorageInformation();
+           return true;
         }
 
     }
