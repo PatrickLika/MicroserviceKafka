@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Storage.Domain.DomainService;
 using Storage.Domain.Model;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace Storage.Infrastructure.DomainService
 {
@@ -16,15 +16,16 @@ namespace Storage.Infrastructure.DomainService
             _configuration = configuration;
         }
 
-        async Task<StorageEntity> IStorageDomainService.GetStorageInformation()
+        async Task<bool> IStorageDomainService.IsInStorage(int screws, int bolts, int nails)
         {
-
             string query = $"SELECT * FROM QUERYABLE_Storage;";
             var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
             HttpResponseMessage response = await _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content);
             var responseContent = await response.Content.ReadAsStringAsync();
 
-           return JsonConvert.DeserializeObject<StorageEntity>(responseContent);
+            var payload = JsonConvert.DeserializeObject<PayloadWrapper>(responseContent);
+
+            if (payload.Payload.Screws >= screws && payload.Payload.Bolts >= bolts && payload.Payload.Nails >= nails) return true;
 
            //TODO Find ud af om dette skal sættes om en en wrapper      
            

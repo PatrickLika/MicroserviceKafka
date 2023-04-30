@@ -28,5 +28,7 @@ namespace Storage.Domain.Model
            return true;
         }
 
+
+
     }
 }
