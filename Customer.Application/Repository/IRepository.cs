@@ -1,9 +1,10 @@
 ﻿using Customer.Application.Queries;
+using Customer.Domain.Model;
 
 namespace Costumer.Application.Repository
 {
     public interface IRepository
     {
-        void ReadCvr(ReadCvrDto dto);
+        void Produce(CustomerEntity entity);
     }
 }

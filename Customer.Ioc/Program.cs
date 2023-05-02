@@ -3,19 +3,22 @@ using Costumer.Application.Queries.Implementation;
 using Costumer.Application.Queries;
 using Costumer.Application.Repository;
 using Costumer.Ioc;
-using Costumer.Infrastructure;
+using Customer.Domain.DomainService;
+using Customer.Infrastructure.DomainService;
+using Customer.Infrastructure.Repository;
 
 var host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((hostContext, services) =>
+    .ConfigureServices(services =>
     {
         services.AddScoped<IRepository, Repository>();
         services.AddScoped<IReadCvr, ReadCvr>();
+        services.AddScoped<ICustomerDomainService, CustomerDomainService>();
 
         services.AddScoped<IProducer<string, string>>(provider =>
         {
             var config = new ProducerConfig
             {
-                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]
+                BootstrapServers = provider.GetRequiredService<IConfiguration>()["Kafka:BootstrapServers"]
             };
 
             return new ProducerBuilder<string, string>(config).Build();
@@ -25,8 +28,8 @@ var host = Host.CreateDefaultBuilder(args)
         {
             var config = new ConsumerConfig
             {
-                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
-                GroupId = hostContext.Configuration["Groups:CustomerGroup"],
+                BootstrapServers = provider.GetRequiredService<IConfiguration>()["Kafka:BootstrapServers"],
+                GroupId = provider.GetRequiredService<IConfiguration>()["Groups:CustomerGroup"],
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 

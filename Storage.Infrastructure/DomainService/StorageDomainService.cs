@@ -27,8 +27,11 @@ namespace Storage.Infrastructure.DomainService
 
             if (payload.Payload.Screws >= screws && payload.Payload.Bolts >= bolts && payload.Payload.Nails >= nails) return true;
 
-           //TODO Find ud af om dette skal sættes om en en wrapper      
-           
+           //TODO Find ud af om dette skal sættes om en en wrapper
+           //
+
+           return false;
+
         }
     }
 }
