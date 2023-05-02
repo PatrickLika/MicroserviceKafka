@@ -1,5 +1,5 @@
 using Confluent.Kafka;
-using StateMachine.Ioc;
+using Storage.Ioc;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -18,14 +18,14 @@ var host = Host.CreateDefaultBuilder(args)
             var config = new ConsumerConfig
             {
                 BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
-                GroupId = hostContext.Configuration["Groups:CustomerGroup"],
+                GroupId = hostContext.Configuration["Groups:StorageGroup"],
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
             return new ConsumerBuilder<string, string>(config).Build();
         });
 
-        services.AddHostedService<StateMachineConsumer>();
+        services.AddHostedService<StorageConsumer>();
 
     })
     .Build();
