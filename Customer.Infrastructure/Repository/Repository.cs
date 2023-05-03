@@ -21,27 +21,25 @@ namespace Customer.Infrastructure.Repository
         {
             if (entity.IsValid)
             {
-                entity.State = CustomerEntity.States.CustomerApproved;
+                entity.State = States.CustomerApproved;
                 await ProduceMessageAsync(entity);
             }
             else
             {
-                entity.State = CustomerEntity.States.CustomerDenied;
+                entity.State = States.CustomerDenied;
                 await ProduceMessageAsync(entity);
             }
         }
 
         private async Task ProduceMessageAsync(CustomerEntity entity)
         {
-            await _producer.ProduceAsync(_configuration["OrderReplyChannel"], new Message<string, string>
+            await _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
             {
                 Key = entity.Id,
                 Value = JsonConvert.SerializeObject(entity)
             });
             _producer.Flush();
         }
-
-
 
     }
 

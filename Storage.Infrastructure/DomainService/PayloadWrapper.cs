@@ -1,8 +1,9 @@
-﻿using Customer.Application.Queries;
+﻿
+using Storage.Application.Commands;
 
 public class PayloadWrapper
 {
-    public ReadCvrDto Payload { get; set; }
+    public StorageDto Payload { get; set; }
 }
 
 

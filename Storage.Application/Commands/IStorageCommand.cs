@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Storage.Application.Commands
+﻿namespace Storage.Application.Commands
 {
-    internal interface IStorageCommand
+    public interface IStorageCommand
     {
+        void CheckStorage(StorageDto dto);
     }
 }

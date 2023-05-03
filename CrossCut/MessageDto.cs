@@ -1,7 +1,6 @@
-﻿
-namespace Customer.Application.Queries
+﻿namespace CrossCut
 {
-    public class ReadCvrDto
+    public class MessageDto
     {
         public string Id { get; set; }
         public int Screws { get; set; }

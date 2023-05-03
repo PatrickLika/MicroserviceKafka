@@ -17,7 +17,7 @@ namespace StateMachine.Ioc
         }
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("OrderReplyChannel");
+            _consumer.Subscribe(_configuration["KafkaTopics:OrderReplyChannel"]);
             Task.Run(() => Consume(cancellationToken));
 
             return Task.CompletedTask;
@@ -38,38 +38,54 @@ namespace StateMachine.Ioc
 
                 switch (dto.State)
                 {
-                    case States.OrderPending:
+                    case var state when state == States.OrderPending:
                         dto.State = States.CustomerPending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Customer"], message.Message.Key, dto);
                         break;
 
-                    case States.CustomerApproved:
+                    case var state when state == States.CustomerApproved:
                         dto.State = States.StoragePending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
                         break;
 
-                    case States.StorageApproved:
+                    case var state when state == States.CustomerDenied:
+                        dto.State = States.Rollback;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        break;
+
+                    case var state when state == States.StorageApproved:
                         dto.State = States.PaymentPending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Payment"], message.Message.Key, dto);
                         break;
 
-                    case States.PaymentApproved:
+                    case var state when state == States.StorageDenied:
+                        dto.State = States.Rollback;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        break;
+
+                    case var state when state == States.PaymentApproved:
                         dto.State = States.ReceiptPending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Receipt"], message.Message.Key, dto);
                         break;
 
-                    case States.ReceiptDone:
+                    case var state when state == States.PaymentDenied:
+                        dto.State = States.Rollback;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        break;
+
+                    case var state when state == States.ReceiptDone:
                         dto.State = States.OrderApproved;
                         await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
-                    case States.OrderApproved:
+                    case var state when state == States.OrderApproved:
                         dto.State = States.OrderSuccessful;
                         await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
                 }
             }
         }
+
 
         private async Task ProduceMessageAsync(string topic, string key, StateMachineDto dto)
         {
