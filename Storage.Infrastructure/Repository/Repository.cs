@@ -18,16 +18,14 @@ namespace Storage.Infrastructure.Repository
         }
         void IRepository.Produce(StorageEntity entity)
         {
-            //if (entity.IsValid)
-            //{
-            //    entity.State = States.CustomerApproved;
-            //    await ProduceMessageAsync(entity);
-            //}
-            //else
-            //{
-            //    entity.State = States.CustomerDenied;
-            //    await ProduceMessageAsync(entity);
-            //}
+            if (entity.IsInStorage)
+            {
+                entity.State = States.CustomerApproved;
+            }
+            else
+            {
+                entity.State = States.CustomerDenied;
+            }
 
 
             entity.State = States.StorageApproved;
