@@ -50,7 +50,7 @@ namespace StateMachine.Ioc
 
                     case var state when state == States.CustomerDenied:
                         dto.State = States.Rollback;
-                        await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                       // await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
                         break;
 
                     case var state when state == States.StorageApproved:
@@ -60,7 +60,7 @@ namespace StateMachine.Ioc
 
                     case var state when state == States.StorageDenied:
                         dto.State = States.Rollback;
-                        await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                       // await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
                         break;
 
                     case var state when state == States.PaymentApproved:
