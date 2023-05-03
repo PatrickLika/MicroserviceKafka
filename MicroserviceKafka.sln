@@ -31,13 +31,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customer.Domain", "Customer
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Receipt", "Receipt", "{03EE1C80-B17C-431A-B901-2A7328EA41D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Receipt.Application", "Receipt.Application\Receipt.Application.csproj", "{97E67C69-0489-4096-BEEF-E5A97CF236A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Receipt.Application", "Receipt.Application\Receipt.Application.csproj", "{97E67C69-0489-4096-BEEF-E5A97CF236A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Receipt. Domain", "Receipt. Domain\Receipt. Domain.csproj", "{7332F584-20BA-4540-AD8B-11FE7ECA22A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Receipt. Domain", "Receipt. Domain\Receipt. Domain.csproj", "{7332F584-20BA-4540-AD8B-11FE7ECA22A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Receipt.Infrastructure", "Receipt.Infrastructure\Receipt.Infrastructure.csproj", "{91758809-86AC-4656-99FF-D92A7C644C98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Receipt.Infrastructure", "Receipt.Infrastructure\Receipt.Infrastructure.csproj", "{91758809-86AC-4656-99FF-D92A7C644C98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Receipt.Ioc", "Receipt.Ioc\Receipt.Ioc.csproj", "{AAE0EBFC-94A6-47A2-A7E0-D75A2A52713A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Receipt.Ioc", "Receipt.Ioc\Receipt.Ioc.csproj", "{AAE0EBFC-94A6-47A2-A7E0-D75A2A52713A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Payment", "Payment", "{44CD8F45-BD64-4C8C-A303-3832D78EF219}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payment.Application", "Payment.Application\Payment.Application.csproj", "{05D9A095-BA34-48AF-8BAD-557201FAB8BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payment.Domain", "Payment.Domain\Payment.Domain.csproj", "{5F50E012-D1CE-4A12-A07F-34E350AB157F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payment.Infrastructure", "Payment.Infrastructure\Payment.Infrastructure.csproj", "{BCDA03EC-0B3F-4523-9B54-7BCD0266528E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payment.Ioc", "Payment.Ioc\Payment.Ioc.csproj", "{A18513B5-EE48-40B4-B940-BDF11324D133}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +111,22 @@ Global
 		{AAE0EBFC-94A6-47A2-A7E0-D75A2A52713A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAE0EBFC-94A6-47A2-A7E0-D75A2A52713A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAE0EBFC-94A6-47A2-A7E0-D75A2A52713A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05D9A095-BA34-48AF-8BAD-557201FAB8BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05D9A095-BA34-48AF-8BAD-557201FAB8BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05D9A095-BA34-48AF-8BAD-557201FAB8BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05D9A095-BA34-48AF-8BAD-557201FAB8BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F50E012-D1CE-4A12-A07F-34E350AB157F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F50E012-D1CE-4A12-A07F-34E350AB157F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F50E012-D1CE-4A12-A07F-34E350AB157F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F50E012-D1CE-4A12-A07F-34E350AB157F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCDA03EC-0B3F-4523-9B54-7BCD0266528E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCDA03EC-0B3F-4523-9B54-7BCD0266528E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCDA03EC-0B3F-4523-9B54-7BCD0266528E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCDA03EC-0B3F-4523-9B54-7BCD0266528E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A18513B5-EE48-40B4-B940-BDF11324D133}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A18513B5-EE48-40B4-B940-BDF11324D133}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A18513B5-EE48-40B4-B940-BDF11324D133}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A18513B5-EE48-40B4-B940-BDF11324D133}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +145,10 @@ Global
 		{7332F584-20BA-4540-AD8B-11FE7ECA22A7} = {03EE1C80-B17C-431A-B901-2A7328EA41D3}
 		{91758809-86AC-4656-99FF-D92A7C644C98} = {03EE1C80-B17C-431A-B901-2A7328EA41D3}
 		{AAE0EBFC-94A6-47A2-A7E0-D75A2A52713A} = {03EE1C80-B17C-431A-B901-2A7328EA41D3}
+		{05D9A095-BA34-48AF-8BAD-557201FAB8BF} = {44CD8F45-BD64-4C8C-A303-3832D78EF219}
+		{5F50E012-D1CE-4A12-A07F-34E350AB157F} = {44CD8F45-BD64-4C8C-A303-3832D78EF219}
+		{BCDA03EC-0B3F-4523-9B54-7BCD0266528E} = {44CD8F45-BD64-4C8C-A303-3832D78EF219}
+		{A18513B5-EE48-40B4-B940-BDF11324D133} = {44CD8F45-BD64-4C8C-A303-3832D78EF219}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D63B1EA0-EB2E-482A-9B00-FBE994BEE91E}
