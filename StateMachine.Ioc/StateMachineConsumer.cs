@@ -86,7 +86,6 @@ namespace StateMachine.Ioc
             }
         }
 
-
         private async Task ProduceMessageAsync(string topic, string key, StateMachineDto dto)
         {
             await _producer.ProduceAsync(topic, new Message<string, string>

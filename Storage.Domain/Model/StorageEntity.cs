@@ -26,13 +26,15 @@ namespace Storage.Domain.Model
             Cvr = cvr;
             State = state;
             _domainService = domainService;
-            IsInStorage = GetIsInStorage();
+            IsInStorage = true;
 
         }
 
         bool GetIsInStorage()
         {
-            return _domainService.IsInStorage(Screws, Bolts, Nails);
+            StorageDbDto dto = _domainService.GetStorage();
+
+            if(dto.)
         }
 
 

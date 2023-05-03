@@ -2,6 +2,6 @@
 {
     public interface IStorageDomainService
     {
-        bool IsInStorage(int screws, int bolts, int nails);
+        StorageDbDto GetStorage();
     }
 }
