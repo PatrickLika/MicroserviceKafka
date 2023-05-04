@@ -20,11 +20,11 @@ namespace Storage.Infrastructure.Repository
         {
             if (entity.IsInStorage)
             {
-                entity.State = States.CustomerApproved;
+                entity.State = States.StorageApproved;
             }
             else
             {
-                entity.State = States.CustomerDenied;
+                entity.State = States.StorageDenied;
             }
 
 

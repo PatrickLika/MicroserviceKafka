@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,31 +9,40 @@ namespace Payment.Domain.Domain
 {
     public class PaymentEntity
     {
-        public string Guid { get; set; }
+        public string Id { get; set; }
+        public int Screws { get; set; }
+        public int Bolts { get; set; }
+        public int Nails { get; set; }
+        public int Price { get; set; }
+        public string Cvr { get; set; }
         public string State { get; set; }
-        public int Pris { get; set; }
+        
 
 
-        public PaymentEntity(string guid, string state, int pris)
+        public PaymentEntity(string id, int screws, int bolts, int nails, int price,string cvr, string state)
         {
-            Guid = guid;
+            Id = id;
+            Screws = screws;
+            Bolts = bolts;
+            Nails = nails;
+            Price = price;
+            Cvr = cvr;
             State = state;
-            Pris = pris;
             PaymentOk();
         }
 
 
         private bool PaymentMax()
         {
-            if (Pris > 5000) { return false; }
+            if (Price > 5000) { return false; }
             return true;
         }
 
         private void PaymentOk()
         {
-            if (PaymentMax()) State = "PaymentApproved";
+            if (PaymentMax()) State = States.PaymentApproved;
             
-            else State = "PaymentDenied";
+            else State = States.PaymentDenied;
         }
 
     }

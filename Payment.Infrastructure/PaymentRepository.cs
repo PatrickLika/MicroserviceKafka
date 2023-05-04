@@ -30,7 +30,7 @@ namespace Payment.Infrastructure
             {
                 _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
                 {
-                    Key = paymentEntity.Guid,
+                    Key = paymentEntity.Id,
                     Value = JsonConvert.SerializeObject(paymentEntity),
                 });
 
@@ -38,6 +38,7 @@ namespace Payment.Infrastructure
             }
             catch (Exception e)
             {
+
             }
         }
     }

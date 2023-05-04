@@ -14,10 +14,11 @@ namespace Receipt._Domain.Model
         public int Nails { get; set; }
         public int Price { get; set; }
         public string Cvr { get; set; }
+        public string State { get; set; }
 
 
 
-        public ReceiptEntity(string id, int screws, int bolts, int nails, int price, string cvr)
+        public ReceiptEntity(string id, int screws, int bolts, int nails, int price, string cvr, string state)
         {
             Id = id;
             Screws = screws;
@@ -25,6 +26,7 @@ namespace Receipt._Domain.Model
             Nails = nails;
             Price = price;
             Cvr = cvr;
+            State = state;
         }
     }
 }

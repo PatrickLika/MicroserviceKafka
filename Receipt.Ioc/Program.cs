@@ -4,7 +4,6 @@ using Receipt.Application.Commands.Implementation;
 using Receipt.Application.Repository;
 using Receipt.Infrastructure;
 using Receipt.Ioc;
-using System;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -25,7 +24,7 @@ var host = Host.CreateDefaultBuilder(args)
             var config = new ConsumerConfig
             {
                 BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
-                GroupId = hostContext.Configuration["Kafka:PaymentGroup"],
+                GroupId = hostContext.Configuration["Groups:ReceiptGroup"],
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
             return new ConsumerBuilder<string, string>(config).Build();

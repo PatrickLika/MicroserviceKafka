@@ -25,7 +25,7 @@ var host = Host.CreateDefaultBuilder(args)
             var config = new ConsumerConfig
             {
                 BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
-                GroupId = hostContext.Configuration["Kafka:PaymentGroup"],
+                GroupId = hostContext.Configuration["Groups:PaymentGroup"],
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
             return new ConsumerBuilder<string, string>(config).Build();

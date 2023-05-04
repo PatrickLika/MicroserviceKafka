@@ -1,10 +1,5 @@
 ﻿using Payment.Application.Repository;
 using Payment.Domain.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Payment.Application.Commands.Implementation
 {
@@ -19,7 +14,7 @@ namespace Payment.Application.Commands.Implementation
 
         void IPaymentCreate.PaymentCreate(PaymentCreateDto dto, string guid)
         {
-            var entity = new PaymentEntity(guid, dto.State, dto.Pris);
+            var entity = new PaymentEntity(dto.Id, dto.Screws, dto.Bolts, dto.Nails, dto.Price, dto.Cvr, dto.State);
             _repository.PaymentCreate(entity);
         }
     }

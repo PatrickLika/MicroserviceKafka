@@ -1,7 +1,4 @@
-﻿
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using Customer.Domain.DomainService;
+﻿using Customer.Domain.DomainService;
 
 namespace Customer.Domain.Model
 {
@@ -16,13 +13,9 @@ namespace Customer.Domain.Model
         public bool IsValid { get; set; }
         public string State { get; set; }
 
-
-
-
         private readonly ICustomerDomainService _domainService;
 
-
-        public CustomerEntity(string id, int screws, int bolts, int nails, int price,string cvr, ICustomerDomainService domainService)
+        public CustomerEntity(string id, int screws, int bolts, int nails, int price, string cvr, ICustomerDomainService domainService)
         {
             Id = id;
             Screws = screws;
@@ -32,13 +25,11 @@ namespace Customer.Domain.Model
             Cvr = cvr;
             _domainService = domainService;
             IsValid = ValidID();
-
         }
-
         private bool ValidID()
         {
-           return _domainService.CvrIsValid(Cvr);
+            return _domainService.CvrIsValid(Cvr);
         }
-        
+
     }
 }
