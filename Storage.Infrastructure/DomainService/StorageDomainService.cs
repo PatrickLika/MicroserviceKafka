@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Storage.Domain.DomainService;
 using System.Text;
@@ -19,7 +20,13 @@ namespace Storage.Infrastructure.DomainService
         {
             string query = $"select * from REMAININGSTORAGE;";
 
-            var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
+            var queryRequest = new
+            {
+                ksql = query,
+                streamsProperties = new { }
+            };
+
+            var content = new StringContent(JsonConvert.SerializeObject(queryRequest), Encoding.UTF8, "application/vnd.ksql.v1+json");
             HttpResponseMessage response = _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content).Result;
             string result = response.Content.ReadAsStringAsync().Result;
 
@@ -37,6 +44,5 @@ namespace Storage.Infrastructure.DomainService
 
             return values;
         }
-
     }
 }

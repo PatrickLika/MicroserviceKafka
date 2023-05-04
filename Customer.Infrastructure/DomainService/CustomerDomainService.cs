@@ -29,7 +29,7 @@ namespace Customer.Infrastructure.DomainService
             {
                 ConsumeResult<string, string> message;
 
-                while ((message = _consumer.Consume(TimeSpan.FromSeconds(5))) != null && !message.IsPartitionEOF)
+                while ((message = _consumer.Consume(TimeSpan.FromSeconds(5))) != null || !message.IsPartitionEOF)
                 {
                     var payloadWrapper = JsonConvert.DeserializeObject<PayloadWrapper>(message.Message.Value);
 

@@ -71,18 +71,22 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTable()
         {
-            string query = $"select * from REMAININGSTORAGE;";
+                string query = $"select * from REMAININGSTORAGE;";
 
-            var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
-            HttpResponseMessage response = _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content).Result;
-            string result = await response.Content.ReadAsStringAsync();
+                var queryRequest = new
+                {
+                    ksql = query,
+                    streamsProperties = new { }
+                };
 
-            JArray jsonResponse = JArray.Parse(result);
-            JObject rowData = (JObject)jsonResponse.FirstOrDefault(x => x["row"] != null);
-            JArray row = rowData != null ? (JArray)rowData["row"]["columns"] : null;
+                var content = new StringContent(JsonConvert.SerializeObject(queryRequest), Encoding.UTF8, "application/vnd.ksql.v1+json");
+                HttpResponseMessage response = _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content).Result;
+                string result = response.Content.ReadAsStringAsync().Result;
 
-            if (row != null)
-            {
+                JArray jsonResponse = JArray.Parse(result);
+                JObject rowData = (JObject)jsonResponse.FirstOrDefault(x => x["row"] != null);
+                JArray row = rowData != null ? (JArray)rowData["row"]["columns"] : null;
+
                 StorageDbDto values = new StorageDbDto
                 {
                     Id = row[0].ToObject<string>(),
@@ -92,11 +96,6 @@ namespace Api.Controllers
                 };
 
                 return Ok(values);
-            }
-            else
-            {
-                return StatusCode(500, "Error: Could not find the row data in the JSON response");
-            }
 
         }
     }
