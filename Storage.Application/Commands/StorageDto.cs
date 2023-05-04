@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Storage.Application.Commands
+﻿namespace Storage.Application.Commands
 {
-    internal class StorageDto
+    public class StorageDto
     {
+        public string Id { get; set; }
+        public int Screws { get; set; }
+        public int Bolts { get; set; }
+        public int Nails { get; set; }
+        public int Price { get; set; }
+        public string Cvr { get; set; }
+        public string State { get; set; }
     }
 }

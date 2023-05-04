@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Storage.Domain.DomainService;
-using Storage.Domain.Model;
 using System.Text;
 
 namespace Storage.Infrastructure.DomainService
@@ -16,22 +16,33 @@ namespace Storage.Infrastructure.DomainService
             _configuration = configuration;
         }
 
-        async Task<bool> IStorageDomainService.IsInStorage(int screws, int bolts, int nails)
+        StorageDbDto IStorageDomainService.GetStorage()
         {
-            string query = $"SELECT * FROM QUERYABLE_Storage;";
-            var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
-            HttpResponseMessage response = await _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content);
-            var responseContent = await response.Content.ReadAsStringAsync();
+            string query = $"select * from REMAININGSTORAGE;";
 
-            var payload = JsonConvert.DeserializeObject<PayloadWrapper>(responseContent);
+            var queryRequest = new
+            {
+                ksql = query,
+                streamsProperties = new { }
+            };
 
-            if (payload.Payload.Screws >= screws && payload.Payload.Bolts >= bolts && payload.Payload.Nails >= nails) return true;
+            var content = new StringContent(JsonConvert.SerializeObject(queryRequest), Encoding.UTF8, "application/vnd.ksql.v1+json");
+            HttpResponseMessage response = _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content).Result;
+            string result = response.Content.ReadAsStringAsync().Result;
 
-           //TODO Find ud af om dette skal sættes om en en wrapper
-           //
+            JArray jsonResponse = JArray.Parse(result);
+            JObject rowData = (JObject)jsonResponse.FirstOrDefault(x => x["row"] != null);
+            JArray row = rowData != null ? (JArray)rowData["row"]["columns"] : null;
 
-           return false;
+            StorageDbDto values = new StorageDbDto
+            {
+                Id = row[0].ToObject<string>(),
+                Screws = row[1].ToObject<int>(),
+                Bolts = row[2].ToObject<int>(),
+                Nails = row[3].ToObject<int>()
+            };
 
+            return values;
         }
     }
 }

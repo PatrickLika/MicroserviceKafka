@@ -1,9 +1,20 @@
 using Confluent.Kafka;
+using Storage.Application.Commands;
+using Storage.Application.Commands.Implementation;
+using Storage.Application.Repository;
+using Storage.Domain.DomainService;
+using Storage.Infrastructure.DomainService;
+using Storage.Infrastructure.Repository;
 using Storage.Ioc;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
+        services.AddScoped<IStorageCommand, StorageCommand>();
+        services.AddScoped<IStorageDomainService,StorageDomainService>();
+        services.AddScoped<IRepository, Repository>();
+        services.AddHttpClient();
+
         services.AddScoped<IProducer<string, string>>(provider =>
         {
             var config = new ProducerConfig

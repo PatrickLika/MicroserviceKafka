@@ -2,7 +2,6 @@
 using Customer.Domain.DomainService;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System.Text.RegularExpressions;
 
 namespace Customer.Infrastructure.DomainService
 {
@@ -17,7 +16,7 @@ namespace Customer.Infrastructure.DomainService
             var config = new ConsumerConfig
             {
                 BootstrapServers = _iConfig["Kafka:BootstrapServers"],
-                GroupId = _iConfig["Groups:Cvr"],
+                GroupId = _iConfig["Groups:CvrGroup"],
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();
@@ -30,7 +29,7 @@ namespace Customer.Infrastructure.DomainService
             {
                 ConsumeResult<string, string> message;
 
-                while ((message = _consumer.Consume(TimeSpan.FromSeconds(5))) != null && !message.IsPartitionEOF)
+                while ((message = _consumer.Consume(TimeSpan.FromSeconds(5))) != null || !message.IsPartitionEOF)
                 {
                     var payloadWrapper = JsonConvert.DeserializeObject<PayloadWrapper>(message.Message.Value);
 

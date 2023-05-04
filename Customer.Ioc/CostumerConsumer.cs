@@ -11,15 +11,16 @@ namespace Costumer.Ioc
         private readonly IReadCvr _iReadCvr;
         private readonly IConfiguration _configuration;
 
-        public CostumerConsumer(IConsumer<string, string> consumer, IReadCvr iReadCvr)
+        public CostumerConsumer(IConsumer<string, string> consumer, IReadCvr iReadCvr, IConfiguration configuration)
         {
             _consumer = consumer;
             _iReadCvr = iReadCvr;
+            _configuration = configuration;
         }
 
         async Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("Customer");
+            _consumer.Subscribe(_configuration["KafkaTopics:Customer"]);
 
             while (!cancellationToken.IsCancellationRequested)
             {

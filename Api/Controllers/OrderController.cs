@@ -2,6 +2,7 @@ using Api.Dto;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Text;
 
 namespace Api.Controllers
@@ -14,14 +15,15 @@ namespace Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
 
-        public OrderController(IProducer<string, string> producer, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public OrderController(IProducer<string, string> producer, IConfiguration configuration,
+            IHttpClientFactory httpClientFactory)
         {
             _producer = producer;
             _configuration = configuration;
             _httpClient = httpClientFactory.CreateClient();
         }
 
-        [HttpPost]
+        [HttpPost("CreateOrder")]
         public ActionResult CreateOrder(OrderDto dto)
         {
             try
@@ -42,32 +44,59 @@ namespace Api.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet]
-        public async Task<IActionResult> GetTable()
+
+
+        [HttpPost("StorageDB")]
+        public ActionResult StorageDB(StorageDbDto dto)
         {
             try
             {
-                string query = "select * from PizzaCount;";
-
-                var content = new StringContent($"{{ \"ksql\": \"{query}\", \"streamsProperties\": {{}} }}", Encoding.UTF8, "application/vnd.ksql.v1+json");
-                HttpResponseMessage response = await _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content);
-
-                if (response.IsSuccessStatusCode)
+                dto.Id = "Refill";
+                _producer.ProduceAsync(_configuration["KafkaTopics:StorageDB"], new Message<string, string>
                 {
-                    string result = await response.Content.ReadAsStringAsync();
-                    return Ok(result);
-                }
-                else
-                {
+                    Key = dto.Id,
+                    Value = JsonConvert.SerializeObject(dto)
+                });
 
-                    return StatusCode((int)response.StatusCode, $"Error: {response.ReasonPhrase}");
-                }
+                _producer.Flush();
+                return Ok();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return StatusCode(500, $"Error: {ex.Message}");
+                return BadRequest(e.Message);
             }
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetTable()
+        {
+                string query = $"select * from REMAININGSTORAGE;";
+
+                var queryRequest = new
+                {
+                    ksql = query,
+                    streamsProperties = new { }
+                };
+
+                var content = new StringContent(JsonConvert.SerializeObject(queryRequest), Encoding.UTF8, "application/vnd.ksql.v1+json");
+                HttpResponseMessage response = _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content).Result;
+                string result = response.Content.ReadAsStringAsync().Result;
+
+                JArray jsonResponse = JArray.Parse(result);
+                JObject rowData = (JObject)jsonResponse.FirstOrDefault(x => x["row"] != null);
+                JArray row = rowData != null ? (JArray)rowData["row"]["columns"] : null;
+
+                StorageDbDto values = new StorageDbDto
+                {
+                    Id = row[0].ToObject<string>(),
+                    Screws = row[1].ToObject<int>(),
+                    Bolts = row[2].ToObject<int>(),
+                    Nails = row[3].ToObject<int>()
+                };
+
+                return Ok(values);
+
+        }
     }
 }

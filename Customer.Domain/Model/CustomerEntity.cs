@@ -14,8 +14,7 @@ namespace Customer.Domain.Model
         public int Price { get; set; }
         public string Cvr { get; set; }
         public bool IsValid { get; set; }
-
-        public States State { get; set; }
+        public string State { get; set; }
 
 
 
@@ -40,24 +39,6 @@ namespace Customer.Domain.Model
         {
            return _domainService.CvrIsValid(Cvr);
         }
-       
-
-        public enum States
-        {
-            OrderPending,
-            CustomerPending,
-            CustomerApproved,
-            CustomerDenied,
-            StoragePending,
-            StorageApproved,
-            PaymentPending,
-            PaymentApproved,
-            ReceiptPending,
-            ReceiptDone,
-            OrderApproved,
-            OrderSuccessful
-        }
-
-
+        
     }
 }
