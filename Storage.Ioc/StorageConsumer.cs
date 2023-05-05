@@ -19,10 +19,21 @@ namespace Storage.Ioc
             _rollBackStorage = rollBackStorage;
         }
 
-        async Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
             _consumer.Subscribe(_configuration["KafkaTopics:Storage"]);
+            Task.Run(() => Consume(cancellationToken));
+            return Task.CompletedTask;
+        }
 
+        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        {
+            _consumer.Close();
+            return Task.CompletedTask;
+        }
+
+        private async Task Consume(CancellationToken cancellationToken)
+        {
             while (!cancellationToken.IsCancellationRequested)
             {
                 var message = _consumer.Consume(cancellationToken);
@@ -45,16 +56,8 @@ namespace Storage.Ioc
                         Nails = dto.Nails
                     });
                 }
-
             }
-
-            await Task.CompletedTask;
-        }
-
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
-        {
             _consumer.Close();
-            return Task.CompletedTask;
         }
     }
 }

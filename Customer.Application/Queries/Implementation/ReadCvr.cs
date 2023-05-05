@@ -1,15 +1,13 @@
-﻿using Costumer.Application.Repository;
-using Customer.Application.Queries;
+﻿using Customer.Application.Repository;
 using Customer.Domain.DomainService;
 using Customer.Domain.Model;
-using static System.Reflection.Metadata.BlobBuilder;
 
-namespace Costumer.Application.Queries.Implementation
+namespace Customer.Application.Queries.Implementation
 {
     public class ReadCvr : IReadCvr
     {
         private readonly IRepository _repository;
-        private readonly ICustomerDomainService  _customerDomainService;
+        private readonly ICustomerDomainService _customerDomainService;
         public ReadCvr(IRepository repository, ICustomerDomainService customerDomainService)
         {
             _repository = repository;
