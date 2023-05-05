@@ -24,7 +24,7 @@ namespace Customer.Domain.Model
             Price = price;
             Cvr = cvr;
             _domainService = domainService;
-            IsValid = ValidID();
+            IsValid = true;
         }
         private bool ValidID()
         {
