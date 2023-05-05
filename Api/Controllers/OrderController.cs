@@ -51,7 +51,7 @@ namespace Api.Controllers
         {
             try
             {
-                dto.Id = "Refill";
+                dto.Id = "Storage";
                 _producer.ProduceAsync(_configuration["KafkaTopics:StorageDB"], new Message<string, string>
                 {
                     Key = dto.Id,

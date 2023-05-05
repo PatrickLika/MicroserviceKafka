@@ -40,7 +40,7 @@ namespace Payment.Ioc
             {
                 var message = _consumer.Consume(cancellationToken);
                 var dto = JsonConvert.DeserializeObject<PaymentCreateDto>(message.Message.Value);
-                _paymentCreate.PaymentCreate(dto, message.Message.Key); //
+                _paymentCreate.PaymentCreate(dto, message.Message.Key);
             }
             _consumer.Close();
         }

@@ -1,7 +1,6 @@
 ﻿using Confluent.Kafka;
 using Newtonsoft.Json;
 using Storage.Application.Commands;
-using Storage.Application.Commands.Implementation;
 
 namespace Storage.Ioc
 {
@@ -10,12 +9,14 @@ namespace Storage.Ioc
         private readonly IConsumer<string, string> _consumer;
         private readonly IConfiguration _configuration;
         private readonly IStorageCommand _storageCommand;
+        private readonly IRollBackStorage _rollBackStorage;
 
-        public StorageConsumer(IConfiguration configuration, IConsumer<string, string> consumer, IStorageCommand storageCommand)
+        public StorageConsumer(IConfiguration configuration, IConsumer<string, string> consumer, IStorageCommand storageCommand, IRollBackStorage rollBackStorage)
         {
             _configuration = configuration;
             _consumer = consumer;
             _storageCommand = storageCommand;
+            _rollBackStorage = rollBackStorage;
         }
 
         async Task IHostedService.StartAsync(CancellationToken cancellationToken)
@@ -28,7 +29,23 @@ namespace Storage.Ioc
                 var dto = JsonConvert.DeserializeObject<StorageDto>(message.Message.Value);
                 dto.Id = message.Message.Key;
 
-                _storageCommand.CheckStorage(dto);
+                if (dto.State == States.StoragePending)
+                {
+                    dto.Id = message.Message.Key;
+                    _storageCommand.CheckStorage(dto);
+                }
+
+                else
+                {
+                    _rollBackStorage.RollBackStorage(new StorageDbDto
+                    {
+                        Id = "Storage",
+                        Screws = dto.Screws,
+                        Bolts = dto.Bolts,
+                        Nails = dto.Nails
+                    });
+                }
+
             }
 
             await Task.CompletedTask;

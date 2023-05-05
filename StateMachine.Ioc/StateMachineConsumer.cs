@@ -82,6 +82,7 @@ namespace StateMachine.Ioc
                         dto.State = States.OrderSuccessful;
                         await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
+
                 }
             }
         }
