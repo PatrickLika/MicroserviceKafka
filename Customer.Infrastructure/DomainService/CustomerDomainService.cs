@@ -19,29 +19,27 @@ namespace Customer.Infrastructure.DomainService
 
         bool ICustomerDomainService.CvrIsValid(string cvr)
         {
-            _consumer.Subscribe(_iConfig["KafkaTopics:Cvr"]);
             _consumer.Assign(new TopicPartitionOffset(new TopicPartition(_iConfig["KafkaTopics:Cvr"], 0), Offset.Beginning));
+
             try
             {
-                ConsumeResult<string, string> message;
-
-                while ((message = _consumer.Consume()) != null && !message.IsPartitionEOF)
+                while (true)
                 {
-                    var payloadWrapper = JsonConvert.DeserializeObject<PayloadWrapper>(message.Message.Value);
+                    var message = _consumer.Consume(TimeSpan.FromSeconds(5));
+                    if (message == null || message.IsPartitionEOF) return false;
 
-                    if (payloadWrapper.Payload.Cvr == cvr)
-                    {
-                        return true;
-                    }
+                    var payloadWrapper = JsonConvert.DeserializeObject<PayloadWrapper>(message.Message.Value);
+                    if (payloadWrapper.Payload.Cvr == cvr) return true;
                 }
             }
             catch (OperationCanceledException)
             {
                 _consumer.Close();
+                return false;
             }
 
-            return false;
         }
+
 
     }
 }
