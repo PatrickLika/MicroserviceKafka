@@ -51,8 +51,8 @@ namespace StateMachine.Ioc
                         break;
 
                     case var state when state == States.CustomerDenied:
-                        dto.State = States.Rollback;
-                       // await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        dto.State = States.OrderDenied;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
                     case var state when state == States.StorageApproved && dto.StatePrevious == States.CustomerApproved:
@@ -62,8 +62,8 @@ namespace StateMachine.Ioc
                         break;
 
                     case var state when state == States.StorageDenied:
-                        dto.State = States.Rollback;
-                       // await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        dto.State = States.OrderDenied;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
                     case var state when state == States.PaymentApproved && dto.StatePrevious == States.StorageApproved:
@@ -89,7 +89,7 @@ namespace StateMachine.Ioc
                         break;
 
                     default:
-                        Console.WriteLine("Fejl");
+                        Console.WriteLine("Rallan vil gerne ha dansk: Ingen switch case fundet");
                         break;
                 }
             }
