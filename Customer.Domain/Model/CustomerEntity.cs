@@ -12,10 +12,11 @@ namespace Customer.Domain.Model
         public string Cvr { get; set; }
         public bool IsValid { get; set; }
         public string State { get; set; }
+        public string StatePrevious { get; set; }
 
         private readonly ICustomerDomainService _domainService;
 
-        public CustomerEntity(string id, int screws, int bolts, int nails, int price, string cvr, ICustomerDomainService domainService)
+        public CustomerEntity(string id, int screws, int bolts, int nails, int price, string cvr, ICustomerDomainService domainService, string statePrevious)
         {
             Id = id;
             Screws = screws;
@@ -25,6 +26,7 @@ namespace Customer.Domain.Model
             Cvr = cvr;
             _domainService = domainService;
             IsValid = true;
+            StatePrevious=statePrevious;
         }
         private bool ValidID()
         {

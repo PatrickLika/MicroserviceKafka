@@ -39,31 +39,35 @@ namespace StateMachine.Ioc
                 switch (dto.State)
                 {
                     case var state when state == States.OrderPending:
+                        dto.StatePrevious = state;
                         dto.State = States.CustomerPending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Customer"], message.Message.Key, dto);
                         break;
 
-                    case var state when state == States.CustomerApproved:
+                    case var state when state == States.CustomerApproved && dto.StatePrevious == States.OrderPending:
+                        dto.StatePrevious = state;    
                         dto.State = States.StoragePending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
                         break;
 
                     case var state when state == States.CustomerDenied:
-                        dto.State = States.Rollback;
-                       // await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        dto.State = States.OrderDenied;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
-                    case var state when state == States.StorageApproved:
+                    case var state when state == States.StorageApproved && dto.StatePrevious == States.CustomerApproved:
+                        dto.StatePrevious = state;
                         dto.State = States.PaymentPending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Payment"], message.Message.Key, dto);
                         break;
 
                     case var state when state == States.StorageDenied:
-                        dto.State = States.Rollback;
-                       // await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                        dto.State = States.OrderDenied;
+                        await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
-                    case var state when state == States.PaymentApproved:
+                    case var state when state == States.PaymentApproved && dto.StatePrevious == States.StorageApproved:
+                        dto.StatePrevious = state;
                         dto.State = States.ReceiptPending;
                         await ProduceMessageAsync(_configuration["KafkaTopics:Receipt"], message.Message.Key, dto);
                         break;
@@ -73,16 +77,20 @@ namespace StateMachine.Ioc
                         await ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
                         break;
 
-                    case var state when state == States.ReceiptDone:
+                    case var state when state == States.ReceiptDone && dto.StatePrevious == States.PaymentApproved:
+                        dto.StatePrevious = state;
                         dto.State = States.OrderApproved;
                         await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
-                    case var state when state == States.OrderApproved:
+                    case var state when state == States.OrderApproved && dto.StatePrevious == States.ReceiptDone:
                         dto.State = States.OrderSuccessful;
                         await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
+                    default:
+                        Console.WriteLine("Rallan vil gerne ha dansk: Ingen switch case fundet");
+                        break;
                 }
             }
         }

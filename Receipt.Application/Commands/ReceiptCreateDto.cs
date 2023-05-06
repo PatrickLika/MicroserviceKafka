@@ -15,5 +15,6 @@ namespace Receipt.Application.Commands
         public int Price { get; set; }
         public string Cvr { get; set; }
         public string State { get; set; }
+        public string StatePrevious { get; set; }
     }
 }

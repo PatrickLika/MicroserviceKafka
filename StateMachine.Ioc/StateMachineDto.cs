@@ -10,6 +10,7 @@
         public string Cvr { get; set; }
         public bool IsValid { get; set; }
         public string State { get; set; }
+        public string StatePrevious { get; set; }
     }
 }
 

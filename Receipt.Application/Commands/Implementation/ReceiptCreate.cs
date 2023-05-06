@@ -19,7 +19,7 @@ namespace Receipt.Application.Commands.Implementation
 
         void IReceiptCreate.ReceiptCreate(ReceiptCreateDto dto, string guid)
         {
-            var model = new ReceiptEntity(guid, dto.Screws, dto.Bolts, dto.Nails, dto.Price, dto.Cvr, dto.State);
+            var model = new ReceiptEntity(guid, dto.Screws, dto.Bolts, dto.Nails, dto.Price, dto.Cvr, dto.State, dto.StatePrevious);
             _repository.CreateReceipt(model);
         }
     }

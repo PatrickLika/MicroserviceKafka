@@ -23,7 +23,8 @@ namespace Customer.Application.Queries.Implementation
                 dto.Nails,
                 dto.Price,
                 dto.Cvr,
-                _customerDomainService
+                _customerDomainService,
+                dto.StatePrevious
             );
 
             _repository.Produce(model);
