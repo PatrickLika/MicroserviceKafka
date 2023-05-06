@@ -6,5 +6,7 @@ namespace Storage.Application.Repository
     {
         void Produce(StorageEntity entity);
 
+        void Rollback(StorageDbDto dto);
+
     }
 }

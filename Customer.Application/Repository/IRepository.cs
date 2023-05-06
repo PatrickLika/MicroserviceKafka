@@ -1,7 +1,6 @@
-﻿using Customer.Application.Queries;
-using Customer.Domain.Model;
+﻿using Customer.Domain.Model;
 
-namespace Costumer.Application.Repository
+namespace Customer.Application.Repository
 {
     public interface IRepository
     {

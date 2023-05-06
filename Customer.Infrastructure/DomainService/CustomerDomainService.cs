@@ -20,6 +20,7 @@ namespace Customer.Infrastructure.DomainService
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();
+            _consumer.Subscribe(_iConfig["KafkaTopics:Cvr"]);
             _consumer.Assign(new TopicPartitionOffset(new TopicPartition(_iConfig["KafkaTopics:Cvr"], 0), Offset.Beginning));
         }
 
@@ -29,7 +30,7 @@ namespace Customer.Infrastructure.DomainService
             {
                 ConsumeResult<string, string> message;
 
-                while ((message = _consumer.Consume(TimeSpan.FromSeconds(5))) != null || !message.IsPartitionEOF)
+                while ((message = _consumer.Consume()) != null && !message.IsPartitionEOF)
                 {
                     var payloadWrapper = JsonConvert.DeserializeObject<PayloadWrapper>(message.Message.Value);
 

@@ -11,8 +11,9 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
         services.AddScoped<IStorageCommand, StorageCommand>();
-        services.AddScoped<IStorageDomainService,StorageDomainService>();
+        services.AddScoped<IStorageDomainService, StorageDomainService>();
         services.AddScoped<IRepository, Repository>();
+        services.AddScoped<IRollBackStorage, RollbackStorage>();
         services.AddHttpClient();
 
         services.AddScoped<IProducer<string, string>>(provider =>

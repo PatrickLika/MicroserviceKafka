@@ -26,11 +26,10 @@ namespace Storage.Domain.Model
             Cvr = cvr;
             State = state;
             _domainService = domainService;
-            IsInStorage = true;
-            IsInStorage = GetIsInStorage();
+            IsInStorage = InStorage();
         }
 
-        bool GetIsInStorage()
+        bool InStorage()
         {
             StorageDbDto dto = _domainService.GetStorage();
 

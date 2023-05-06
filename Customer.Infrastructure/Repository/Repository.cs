@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-using Costumer.Application.Repository;
+using Customer.Application.Repository;
 using Customer.Domain.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;

@@ -32,5 +32,6 @@ namespace Storage.Application.Commands.Implementation
         
             _repository.Produce(entity);
         }
+
     }
 }

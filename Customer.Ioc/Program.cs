@@ -1,14 +1,14 @@
 using Confluent.Kafka;
-using Costumer.Application.Queries.Implementation;
-using Costumer.Application.Queries;
-using Costumer.Application.Repository;
 using Costumer.Ioc;
+using Customer.Application.Queries;
+using Customer.Application.Queries.Implementation;
+using Customer.Application.Repository;
 using Customer.Domain.DomainService;
 using Customer.Infrastructure.DomainService;
 using Customer.Infrastructure.Repository;
 
 var host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
+    .ConfigureServices((hostContext, services) =>
     {
         services.AddScoped<IRepository, Repository>();
         services.AddScoped<IReadCvr, ReadCvr>();
@@ -18,7 +18,7 @@ var host = Host.CreateDefaultBuilder(args)
         {
             var config = new ProducerConfig
             {
-                BootstrapServers = provider.GetRequiredService<IConfiguration>()["Kafka:BootstrapServers"]
+                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]
             };
 
             return new ProducerBuilder<string, string>(config).Build();
@@ -28,17 +28,16 @@ var host = Host.CreateDefaultBuilder(args)
         {
             var config = new ConsumerConfig
             {
-                BootstrapServers = provider.GetRequiredService<IConfiguration>()["Kafka:BootstrapServers"],
-                GroupId = provider.GetRequiredService<IConfiguration>()["Groups:CustomerGroup"],
+                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
+                GroupId = hostContext.Configuration["Groups:CustomerGroup"],
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
             return new ConsumerBuilder<string, string>(config).Build();
         });
 
-
-        services.AddHostedService<CostumerConsumer>();
-
+        services.AddHostedService<CustomerConsumer>();
+        services.AddHostedService<CustomerConsumer>();
     })
     .Build();
 

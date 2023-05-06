@@ -4,7 +4,6 @@ using Payment.Application.Commands.Implementation;
 using Payment.Application.Repository;
 using Payment.Infrastructure;
 using Payment.Ioc;
-using System;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>

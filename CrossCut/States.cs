@@ -1,6 +1,7 @@
 ﻿public class States
 {
     public static readonly string OrderPending = "OrderPending";
+    public static readonly string OrderDenied = "OrderDenied";
     public static readonly string CustomerPending = "CustomerPending";
     public static readonly string CustomerApproved = "CustomerApproved";
     public static readonly string CustomerDenied = "CustomerDenied";

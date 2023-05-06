@@ -1,6 +1,6 @@
 ﻿using Customer.Application.Queries;
 
-namespace Costumer.Application.Queries
+namespace Customer.Application.Queries
 {
     public interface IReadCvr
     {
