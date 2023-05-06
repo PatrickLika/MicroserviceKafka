@@ -11,12 +11,13 @@ namespace Storage.Domain.Model
         public int Price { get; set; }
         public string Cvr { get; set; }
         public string State { get; set; }
+        public string StatePrevious { get; set; }
 
         public bool IsInStorage { get; set; }
 
         private readonly IStorageDomainService _domainService;
 
-        public StorageEntity(string id, int screws, int bolts, int nails, int price, string cvr, string state, IStorageDomainService domainService)
+        public StorageEntity(string id, int screws, int bolts, int nails, int price, string cvr, string state, IStorageDomainService domainService, string statePrevious)
         {
             Id = id;
             Screws = screws;
@@ -27,6 +28,7 @@ namespace Storage.Domain.Model
             State = state;
             _domainService = domainService;
             IsInStorage = InStorage();
+            StatePrevious=statePrevious;
         }
 
         bool InStorage()
