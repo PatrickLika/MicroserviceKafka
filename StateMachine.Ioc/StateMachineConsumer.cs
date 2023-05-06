@@ -88,6 +88,9 @@ namespace StateMachine.Ioc
                         await ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                         break;
 
+                    default:
+                        Console.WriteLine("Fejl");
+                        break;
                 }
             }
         }
