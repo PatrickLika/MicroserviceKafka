@@ -6,6 +6,7 @@ using Customer.Application.Repository;
 using Customer.Domain.DomainService;
 using Customer.Infrastructure.DomainService;
 using Customer.Infrastructure.Repository;
+using Customer.Ioc;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -24,7 +25,7 @@ var host = Host.CreateDefaultBuilder(args)
             return new ProducerBuilder<string, string>(config).Build();
         });
 
-        services.AddScoped<IConsumer<string, string>>(provider =>
+        services.AddScoped<CustomerConsumerWrapper>(provider =>
         {
             var config = new ConsumerConfig
             {
@@ -33,10 +34,21 @@ var host = Host.CreateDefaultBuilder(args)
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
+            return new CustomerConsumerWrapper(new ConsumerBuilder<string, string>(config).Build());
+        });
+
+
+        services.AddScoped<IConsumer<string,string>>(provider =>
+        {
+            var config = new ConsumerConfig
+            {
+                BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
+                GroupId = hostContext.Configuration["Groups:CvrGroup"],
+            };
+
             return new ConsumerBuilder<string, string>(config).Build();
         });
 
-        services.AddHostedService<CustomerConsumer>();
         services.AddHostedService<CustomerConsumer>();
     })
     .Build();
