@@ -26,7 +26,8 @@ namespace Storage.Application.Commands.Implementation
                 dto.Price,
                 dto.Cvr,
                 dto.State,
-                _storageDomainService
+                _storageDomainService,
+                dto.StatePrevious
             );
 
         

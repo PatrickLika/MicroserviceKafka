@@ -16,10 +16,11 @@ namespace Payment.Domain.Domain
         public int Price { get; set; }
         public string Cvr { get; set; }
         public string State { get; set; }
+        public string StatePrevious { get; set; }
         
 
 
-        public PaymentEntity(string id, int screws, int bolts, int nails, int price,string cvr, string state)
+        public PaymentEntity(string id, int screws, int bolts, int nails, int price,string cvr, string state, string statePrevious)
         {
             Id = id;
             Screws = screws;
@@ -28,6 +29,7 @@ namespace Payment.Domain.Domain
             Price = price;
             Cvr = cvr;
             State = state;
+            StatePrevious = statePrevious;
             PaymentOk();
         }
 

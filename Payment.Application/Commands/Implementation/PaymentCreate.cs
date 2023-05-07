@@ -14,7 +14,7 @@ namespace Payment.Application.Commands.Implementation
 
         void IPaymentCreate.PaymentCreate(PaymentCreateDto dto, string guid)
         {
-            var entity = new PaymentEntity(dto.Id, dto.Screws, dto.Bolts, dto.Nails, dto.Price, dto.Cvr, dto.State);
+            var entity = new PaymentEntity(dto.Id, dto.Screws, dto.Bolts, dto.Nails, dto.Price, dto.Cvr, dto.State, dto.StatePrevious);
             _repository.PaymentCreate(entity);
         }
     }
