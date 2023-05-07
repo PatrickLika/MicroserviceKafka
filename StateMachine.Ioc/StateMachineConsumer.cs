@@ -104,6 +104,7 @@ namespace StateMachine.Ioc
                 Value = JsonConvert.SerializeObject(dto)
             });
             _producer.Flush();
+
         }
 
     }

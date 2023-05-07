@@ -10,43 +10,36 @@ namespace Customer.Infrastructure.DomainService
         private readonly IConsumer<string, string> _consumer;
         private readonly IConfiguration _iConfig;
 
-        public CustomerDomainService(IConfiguration iConfiguration)
-        {
-            _iConfig = iConfiguration;
-            var config = new ConsumerConfig
-            {
-                BootstrapServers = _iConfig["Kafka:BootstrapServers"],
-                GroupId = _iConfig["Groups:CvrGroup"],
-            };
 
-            _consumer = new ConsumerBuilder<string, string>(config).Build();
-            _consumer.Subscribe(_iConfig["KafkaTopics:Cvr"]);
-            _consumer.Assign(new TopicPartitionOffset(new TopicPartition(_iConfig["KafkaTopics:Cvr"], 0), Offset.Beginning));
+        public CustomerDomainService(IConsumer<string, string> consumer, IConfiguration iConfig)
+        {
+            _consumer = consumer;
+            _iConfig = iConfig;
         }
 
         bool ICustomerDomainService.CvrIsValid(string cvr)
         {
+            _consumer.Assign(new TopicPartitionOffset(new TopicPartition(_iConfig["KafkaTopics:Cvr"], 0), Offset.Beginning));
+
             try
             {
-                ConsumeResult<string, string> message;
-
-                while ((message = _consumer.Consume()) != null && !message.IsPartitionEOF)
+                while (true)
                 {
-                    var payloadWrapper = JsonConvert.DeserializeObject<PayloadWrapper>(message.Message.Value);
+                    var message = _consumer.Consume(TimeSpan.FromSeconds(5));
+                    if (message == null || message.IsPartitionEOF) return false;
 
-                    if (payloadWrapper.Payload.Cvr == cvr)
-                    {
-                        return true;
-                    }
+                    var payloadWrapper = JsonConvert.DeserializeObject<PayloadWrapper>(message.Message.Value);
+                    if (payloadWrapper.Payload.Cvr == cvr) return true;
                 }
             }
             catch (OperationCanceledException)
             {
                 _consumer.Close();
+                return false;
             }
 
-            return false;
         }
+
 
     }
 }

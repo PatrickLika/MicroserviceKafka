@@ -1,6 +1,11 @@
 ﻿using Confluent.Kafka;
 using Customer.Application.Queries;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Customer.Ioc;
 
 namespace Costumer.Ioc
 {
@@ -10,14 +15,14 @@ namespace Costumer.Ioc
         private readonly IReadCvr _iReadCvr;
         private readonly IConfiguration _configuration;
 
-        public CustomerConsumer(IConsumer<string, string> consumer, IReadCvr iReadCvr, IConfiguration configuration)
+        public CustomerConsumer(CustomerConsumerWrapper customerConsumerWrapper, IReadCvr iReadCvr, IConfiguration configuration)
         {
-            _consumer = consumer;
+            _consumer = customerConsumerWrapper.Consumer;
             _iReadCvr = iReadCvr;
             _configuration = configuration;
         }
 
-         Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             _consumer.Subscribe(_configuration["KafkaTopics:Customer"]);
             Task.Run(() => Consume(cancellationToken));
@@ -25,12 +30,11 @@ namespace Costumer.Ioc
             return Task.CompletedTask;
         }
 
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             _consumer.Close();
             return Task.CompletedTask;
         }
-
 
         private async Task Consume(CancellationToken cancellationToken)
         {
@@ -43,6 +47,5 @@ namespace Costumer.Ioc
             }
             _consumer.Close();
         }
-
     }
 }
