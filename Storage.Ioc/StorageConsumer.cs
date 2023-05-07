@@ -50,7 +50,8 @@ namespace Storage.Ioc
                 {
                     _rollBackStorage.RollBackStorage(new StorageDbDto
                     {
-                        Id = "Storage",
+                        RowId = "Storage",
+                        Id = message.Message.Key,
                         Screws = dto.Screws,
                         Bolts = dto.Bolts,
                         Nails = dto.Nails

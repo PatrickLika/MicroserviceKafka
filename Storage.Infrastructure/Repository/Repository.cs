@@ -37,13 +37,19 @@ namespace Storage.Infrastructure.Repository
             }
 
             ProduceMessage(_configuration["KafkaTopics:OrderReplyChannel"], entity.Id, JsonConvert.SerializeObject(entity));
+
+            _producer.Flush();
+
         }
 
         void IRepository.Rollback(StorageDbDto dto)
         {
-            ProduceMessage(_configuration["KafkaTopics:StorageDB"], dto.Id, JsonConvert.SerializeObject(dto));
+            ProduceMessage(_configuration["KafkaTopics:StorageDB"], dto.RowId, JsonConvert.SerializeObject(dto));
 
             ProduceMessage(_configuration["KafkaTopics:OrderReplyChannel"], dto.Id, States.OrderDenied);
+
+            _producer.Flush();
+
         }
 
         private void StorageDB(StorageDbDto dto)
@@ -66,7 +72,6 @@ namespace Storage.Infrastructure.Repository
                 Key = key,
                 Value = value
             });
-            _producer.Flush();
         }
     }
 }
