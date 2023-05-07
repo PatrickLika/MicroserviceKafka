@@ -91,6 +91,7 @@ namespace StateMachine.Ioc
                     default:
                         Console.WriteLine("Rallan vil gerne ha dansk: Ingen switch case fundet");
                         break;
+
                 }
             }
         }
