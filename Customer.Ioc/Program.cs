@@ -1,5 +1,4 @@
 using Confluent.Kafka;
-using Costumer.Ioc;
 using Customer.Application.Queries;
 using Customer.Application.Queries.Implementation;
 using Customer.Application.Repository;

@@ -56,7 +56,7 @@ namespace Storage.Infrastructure.Repository
             dto.Bolts *= -1;
             dto.Nails *= -1;
 
-            ProduceMessage(_configuration["KafkaTopics:StorageDB"],dto.Id, JsonConvert.SerializeObject(dto));
+            ProduceMessage(_configuration["KafkaTopics:StorageDB"],"Storage", JsonConvert.SerializeObject(dto));
         }
 
         private void ProduceMessage(string topic, string key, string value)

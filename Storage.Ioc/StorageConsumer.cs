@@ -36,25 +36,34 @@ namespace Storage.Ioc
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var message = _consumer.Consume(cancellationToken);
-                var dto = JsonConvert.DeserializeObject<StorageDto>(message.Message.Value);
-                dto.Id = message.Message.Key;
+                var message = _consumer.Consume(TimeSpan.FromSeconds(5));
 
-                if (dto.State == States.StoragePending)
+                if (message != null)
                 {
+                    var dto = JsonConvert.DeserializeObject<StorageDto>(message.Message.Value);
                     dto.Id = message.Message.Key;
-                    _storageCommand.CheckStorage(dto);
-                }
 
-                else
-                {
-                    _rollBackStorage.RollBackStorage(new StorageDbDto
+                    if (dto.State == States.StoragePending)
                     {
-                        Id = "Storage",
-                        Screws = dto.Screws,
-                        Bolts = dto.Bolts,
-                        Nails = dto.Nails
-                    });
+                        dto.Id = message.Message.Key;
+                        _storageCommand.CheckStorage(dto);
+                    }
+
+                    else if(dto.State == States.Rollback)
+                    {
+                        _rollBackStorage.RollBackStorage(new StorageDbDto
+                        {
+                            Id = "Storage",
+                            Screws = dto.Screws,
+                            Bolts = dto.Bolts,
+                            Nails = dto.Nails
+                        });
+                    }
+
+                    else
+                    {
+                        Console.WriteLine("State fejl i storage");
+                    }
                 }
             }
             _consumer.Close();

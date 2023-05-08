@@ -1,6 +1,6 @@
 ﻿using Storage.Application.Repository;
 
-namespace Storage.Application.Commands
+namespace Storage.Application.Commands.Implementation
 {
     public class RollbackStorage : IRollBackStorage
     {

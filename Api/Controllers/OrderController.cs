@@ -1,4 +1,3 @@
-using Api.Dto;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;

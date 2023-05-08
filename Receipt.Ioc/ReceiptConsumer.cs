@@ -4,7 +4,7 @@ using Receipt.Application.Commands;
 
 namespace Receipt.Ioc
 {
-    public class ReceiptConsumer: IHostedService
+    public class ReceiptConsumer : IHostedService
     {
         private readonly IConsumer<string, string> _consumer;
         private readonly IReceiptCreate _receiptCreate;
@@ -12,8 +12,8 @@ namespace Receipt.Ioc
 
         public ReceiptConsumer(IConsumer<string, string> consumer, IReceiptCreate receiptCreate)
         {
-            _consumer=consumer;
-            _receiptCreate=receiptCreate;
+            _consumer = consumer;
+            _receiptCreate = receiptCreate;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -36,9 +36,12 @@ namespace Receipt.Ioc
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var message = _consumer.Consume(cancellationToken);
-                var dto = JsonConvert.DeserializeObject<ReceiptCreateDto>(message.Message.Value);
-                _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+                var message = _consumer.Consume(TimeSpan.FromSeconds(5));
+                if (message != null)
+                {
+                    var dto = JsonConvert.DeserializeObject<ReceiptCreateDto>(message.Message.Value);
+                    _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+                }
             }
             _consumer.Close();
         }

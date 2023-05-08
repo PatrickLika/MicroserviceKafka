@@ -1,13 +1,8 @@
 ﻿using Confluent.Kafka;
 using Customer.Application.Queries;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using Customer.Ioc;
 
-namespace Costumer.Ioc
+namespace Customer.Ioc
 {
     public class CustomerConsumer : IHostedService
     {
@@ -22,7 +17,7 @@ namespace Costumer.Ioc
             _configuration = configuration;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
             _consumer.Subscribe(_configuration["KafkaTopics:Customer"]);
             Task.Run(() => Consume(cancellationToken));
@@ -30,7 +25,7 @@ namespace Costumer.Ioc
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        Task IHostedService.StopAsync(CancellationToken cancellationToken)
         {
             _consumer.Close();
             return Task.CompletedTask;
@@ -40,10 +35,15 @@ namespace Costumer.Ioc
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var message = _consumer.Consume(cancellationToken);
-                var dto = JsonConvert.DeserializeObject<ReadCvrDto>(message.Message.Value);
-                dto.Id = message.Message.Key;
-                _iReadCvr.ReadCvr(dto);
+                var message = _consumer.Consume(TimeSpan.FromSeconds(5));
+
+                if (message != null)
+                {
+                    var dto = JsonConvert.DeserializeObject<ReadCvrDto>(message.Message.Value);
+                    dto.Id = message.Message.Key;
+                    _iReadCvr.ReadCvr(dto);
+
+                }
             }
             _consumer.Close();
         }

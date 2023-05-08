@@ -9,38 +9,40 @@ namespace Payment.Ioc
 
         private readonly IConsumer<string, string> _consumer;
         private readonly IPaymentCreate _paymentCreate;
-        private Task _executingTask;
+        private readonly IConfiguration _configuration;
 
 
-        public PaymentConsumer(IConsumer<string, string> consumer, IPaymentCreate paymentCreate)
+        public PaymentConsumer(IConsumer<string, string> consumer, IPaymentCreate paymentCreate, IConfiguration configuration)
         {
             _consumer = consumer;
             _paymentCreate = paymentCreate;
+            _configuration = configuration;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("Payment");
-            _executingTask = Task.Run(() => Consume(cancellationToken));
+            _consumer.Subscribe(_configuration["KafkaTopics:Payment"]);
+            Task.Run(() => Consume(cancellationToken));
             return Task.CompletedTask;
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        Task IHostedService.StopAsync(CancellationToken cancellationToken)
         {
-            if (_executingTask != null)
-            {
-                _consumer.Close();
-                await Task.WhenAny(_executingTask, Task.Delay(-1, cancellationToken));
-            }
+            _consumer.Close();
+            return Task.CompletedTask;
         }
 
         private async Task Consume(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var message = _consumer.Consume(cancellationToken);
-                var dto = JsonConvert.DeserializeObject<PaymentCreateDto>(message.Message.Value);
-                _paymentCreate.PaymentCreate(dto, message.Message.Key);
+                var message = _consumer.Consume(TimeSpan.FromSeconds(5));
+
+                if (message != null)
+                {
+                    var dto = JsonConvert.DeserializeObject<PaymentCreateDto>(message.Message.Value);
+                    _paymentCreate.PaymentCreate(dto, message.Message.Key);
+                }
             }
             _consumer.Close();
         }
