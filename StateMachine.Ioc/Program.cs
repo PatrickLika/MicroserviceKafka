@@ -19,7 +19,10 @@ var host = Host.CreateDefaultBuilder(args)
             {
                 BootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"],
                 GroupId = hostContext.Configuration["Groups:OrderReplyChannelGroup"],
-                AutoOffsetReset = AutoOffsetReset.Earliest
+                AutoOffsetReset = AutoOffsetReset.Earliest,
+                MaxPollIntervalMs = 20000,
+                SessionTimeoutMs = 10000,
+                Debug = "consumer,cgrp,topic,fetch"
             };
 
             return new ConsumerBuilder<string, string>(config)
