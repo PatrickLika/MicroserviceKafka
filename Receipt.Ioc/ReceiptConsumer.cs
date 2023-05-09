@@ -8,7 +8,6 @@ namespace Receipt.Ioc
     {
         private readonly IConsumer<string, string> _consumer;
         private readonly IReceiptCreate _receiptCreate;
-        private Task _executingTask;
 
         public ReceiptConsumer(IConsumer<string, string> consumer, IReceiptCreate receiptCreate)
         {
@@ -19,17 +18,14 @@ namespace Receipt.Ioc
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _consumer.Subscribe("Receipt");
-            _executingTask = Task.Run(() => Consume(cancellationToken));
+            Task.Run(() => Consume(cancellationToken));
             return Task.CompletedTask;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (_executingTask != null)
-            {
-                _consumer.Close();
-                await Task.WhenAny(_executingTask, Task.Delay(-1, cancellationToken));
-            }
+             _consumer.Close();
+             _consumer.Unsubscribe();
         }
 
         private async Task Consume(CancellationToken cancellationToken)
@@ -40,7 +36,7 @@ namespace Receipt.Ioc
                 if (message != null)
                 {
                     var dto = JsonConvert.DeserializeObject<ReceiptCreateDto>(message.Message.Value);
-                    _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+                   await _receiptCreate.ReceiptCreate(dto, message.Message.Key);
                 }
             }
             _consumer.Close();
