@@ -1,4 +1,5 @@
-﻿using Storage.Domain.Model;
+﻿using Storage.Application.Commands;
+using Storage.Domain.Model;
 
 namespace Storage.Application.Repository
 {
@@ -6,7 +7,7 @@ namespace Storage.Application.Repository
     {
         void Produce(StorageEntity entity);
 
-        void Rollback(StorageDbDto dto);
+        void Rollback(StorageDbDto dto, StorageDto storageDto);
 
     }
 }

@@ -57,7 +57,7 @@ namespace Storage.Ioc
                             Screws = dto.Screws,
                             Bolts = dto.Bolts,
                             Nails = dto.Nails
-                        });
+                        }, dto);
                     }
 
                     else

@@ -38,7 +38,7 @@ namespace Payment.Infrastructure
             }
             catch (Exception e)
             {
-
+                Console.WriteLine($"Error in PaymentRepository.PaymentCreate: {e.Message}");
             }
         }
     }

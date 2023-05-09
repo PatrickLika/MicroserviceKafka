@@ -19,14 +19,26 @@ namespace StateMachine.Ioc
         {
 
             _consumer.Subscribe(_configuration["KafkaTopics:OrderReplyChannel"]);
+
             while (true)
             {
-                 var message = _consumer.Consume(TimeSpan.FromSeconds(5));
+                var message = _consumer.Consume();
 
                 if (message != null)
                 {
+                    string jsonString = message.Message.Value;
+                    Console.WriteLine(jsonString);
 
-                    var dto = JsonConvert.DeserializeObject<StateMachineDto>(message.Message.Value);
+                    StateMachineDto dto = null;
+                    try
+                    {
+                        dto = JsonConvert.DeserializeObject<StateMachineDto>(jsonString);
+                    }
+                    catch (JsonReaderException ex)
+                    {
+                        Console.WriteLine($"Error deserializing JSON string: {ex.Message}");
+                    }
+
 
                     switch (dto.State)
                     {
@@ -34,63 +46,67 @@ namespace StateMachine.Ioc
                             dto.StatePrevious = state;
                             dto.State = States.CustomerPending;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:Customer"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:Customer"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.CustomerApproved && dto.StatePrevious == States.OrderPending:
                             dto.StatePrevious = state;
                             dto.State = States.StoragePending;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.CustomerDenied:
                             dto.State = States.OrderDenied;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.StorageApproved && dto.StatePrevious == States.CustomerApproved:
                             dto.StatePrevious = state;
                             dto.State = States.PaymentPending;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:Payment"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:Payment"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.StorageDenied:
                             dto.State = States.OrderDenied;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.PaymentApproved && dto.StatePrevious == States.StorageApproved:
                             dto.StatePrevious = state;
                             dto.State = States.ReceiptPending;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:Receipt"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:Receipt"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.PaymentDenied:
                             dto.State = States.Rollback;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:Storage"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.ReceiptDone && dto.StatePrevious == States.PaymentApproved:
                             dto.StatePrevious = state;
                             dto.State = States.OrderApproved;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.OrderApproved && dto.StatePrevious == States.ReceiptDone:
                             dto.State = States.OrderSuccessful;
                             Console.WriteLine("Besked med ID: " + message.Message.Key + "Behandlet");
-                             ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
+                            ProduceMessageAsync(_configuration["KafkaTopics:OrderReplyChannel"], message.Message.Key, dto);
                             break;
 
                         case var state when state == States.OrderSuccessful:
                             Console.WriteLine("order færdig med id:" + message.Message.Key);
+                            break;
+
+                        case var state when state == States.OrderDenied:
+                            Console.WriteLine("OrderDenied");
                             break;
 
                         default:
