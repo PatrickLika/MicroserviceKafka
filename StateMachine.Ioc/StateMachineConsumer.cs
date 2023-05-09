@@ -105,7 +105,6 @@ namespace StateMachine.Ioc
                             break;
 
                         case var state when state == States.OrderDenied:
-                            Console.WriteLine("OrderDenied");
                             break;
 
                         default:

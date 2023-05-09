@@ -24,8 +24,8 @@ namespace Receipt.Ioc
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-             _consumer.Close();
-             _consumer.Unsubscribe();
+            _consumer.Close();
+            _consumer.Unsubscribe();
         }
 
         private async Task Consume(CancellationToken cancellationToken)
@@ -36,7 +36,7 @@ namespace Receipt.Ioc
                 if (message != null)
                 {
                     var dto = JsonConvert.DeserializeObject<ReceiptCreateDto>(message.Message.Value);
-                   await _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+                    await _receiptCreate.ReceiptCreate(dto, message.Message.Key);
                 }
             }
             _consumer.Close();

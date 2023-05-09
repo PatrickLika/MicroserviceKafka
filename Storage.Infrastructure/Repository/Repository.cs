@@ -54,9 +54,7 @@ namespace Storage.Infrastructure.Repository
 
         private void StorageDB(StorageDbDto dto)
         {
-            //dto.Screws = -Math.Abs(dto.Screws);
-            //dto.Bolts = -Math.Abs(dto.Bolts);
-            //dto.Nails = -Math.Abs(dto.Nails);
+            
 
             dto.Screws *= -1;
             dto.Bolts *= -1;
