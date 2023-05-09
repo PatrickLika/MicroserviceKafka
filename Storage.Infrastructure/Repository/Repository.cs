@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Storage.Application.Commands;
 using Storage.Application.Repository;
 using Storage.Domain.Model;
 
@@ -37,26 +38,29 @@ namespace Storage.Infrastructure.Repository
             }
 
             ProduceMessage(_configuration["KafkaTopics:OrderReplyChannel"], entity.Id, JsonConvert.SerializeObject(entity));
+
+            _producer.Flush();
         }
 
-        void IRepository.Rollback(StorageDbDto dto)
+        void IRepository.Rollback(StorageDbDto dto, StorageDto storageDto)
         {
             ProduceMessage(_configuration["KafkaTopics:StorageDB"], dto.Id, JsonConvert.SerializeObject(dto));
 
-            ProduceMessage(_configuration["KafkaTopics:OrderReplyChannel"], dto.Id, States.OrderDenied);
+            storageDto.State = States.OrderDenied;
+            ProduceMessage(_configuration["KafkaTopics:OrderReplyChannel"], dto.Id, JsonConvert.SerializeObject(storageDto) );
+
+            _producer.Flush();
         }
 
         private void StorageDB(StorageDbDto dto)
         {
-            //dto.Screws = -Math.Abs(dto.Screws);
-            //dto.Bolts = -Math.Abs(dto.Bolts);
-            //dto.Nails = -Math.Abs(dto.Nails);
+            
 
             dto.Screws *= -1;
             dto.Bolts *= -1;
             dto.Nails *= -1;
 
-            ProduceMessage(_configuration["KafkaTopics:StorageDB"],dto.Id, JsonConvert.SerializeObject(dto));
+            ProduceMessage(_configuration["KafkaTopics:StorageDB"],"Storage", JsonConvert.SerializeObject(dto));
         }
 
         private void ProduceMessage(string topic, string key, string value)
@@ -65,8 +69,7 @@ namespace Storage.Infrastructure.Repository
             {
                 Key = key,
                 Value = value
-            });
-            _producer.Flush();
+            }); 
         }
     }
 }

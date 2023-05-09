@@ -9,6 +9,6 @@ namespace Receipt.Application.Repository
 {
     public interface IReceiptRepository
     {
-        void CreateReceipt(ReceiptEntity receiptEntity);
+        Task CreateReceipt(ReceiptEntity receiptEntity);
     }
 }

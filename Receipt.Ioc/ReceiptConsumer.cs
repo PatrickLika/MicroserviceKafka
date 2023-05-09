@@ -4,41 +4,40 @@ using Receipt.Application.Commands;
 
 namespace Receipt.Ioc
 {
-    public class ReceiptConsumer: IHostedService
+    public class ReceiptConsumer : IHostedService
     {
         private readonly IConsumer<string, string> _consumer;
         private readonly IReceiptCreate _receiptCreate;
-        private Task _executingTask;
 
         public ReceiptConsumer(IConsumer<string, string> consumer, IReceiptCreate receiptCreate)
         {
-            _consumer=consumer;
-            _receiptCreate=receiptCreate;
+            _consumer = consumer;
+            _receiptCreate = receiptCreate;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _consumer.Subscribe("Receipt");
-            _executingTask = Task.Run(() => Consume(cancellationToken));
+            Task.Run(() => Consume(cancellationToken));
             return Task.CompletedTask;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (_executingTask != null)
-            {
-                _consumer.Close();
-                await Task.WhenAny(_executingTask, Task.Delay(-1, cancellationToken));
-            }
+            _consumer.Close();
+            _consumer.Unsubscribe();
         }
 
         private async Task Consume(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var message = _consumer.Consume(cancellationToken);
-                var dto = JsonConvert.DeserializeObject<ReceiptCreateDto>(message.Message.Value);
-                _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+                var message = _consumer.Consume(TimeSpan.FromSeconds(5));
+                if (message != null)
+                {
+                    var dto = JsonConvert.DeserializeObject<ReceiptCreateDto>(message.Message.Value);
+                    await _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+                }
             }
             _consumer.Close();
         }

@@ -2,6 +2,6 @@
 {
     public interface IRollBackStorage
     {
-        void RollBackStorage(StorageDbDto dto);
+        void RollBackStorage(StorageDbDto dto, StorageDto storageDto);
     }
 }

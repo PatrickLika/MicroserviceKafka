@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Receipt.Application.Commands
 {
     public interface IReceiptCreate
-    {
-        public void ReceiptCreate(ReceiptCreateDto dto, string guid); 
+    { 
+        Task ReceiptCreate(ReceiptCreateDto dto, string guid); 
     }
 }

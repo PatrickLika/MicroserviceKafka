@@ -1,6 +1,6 @@
 ﻿using Storage.Application.Repository;
 
-namespace Storage.Application.Commands
+namespace Storage.Application.Commands.Implementation
 {
     public class RollbackStorage : IRollBackStorage
     {
@@ -10,9 +10,9 @@ namespace Storage.Application.Commands
             _repository = repository;
         }
 
-        void IRollBackStorage.RollBackStorage(StorageDbDto dto)
+        void IRollBackStorage.RollBackStorage(StorageDbDto dto, StorageDto storageDto)
         {
-            _repository.Rollback(dto);
+            _repository.Rollback(dto, storageDto);
         }
     }
 }

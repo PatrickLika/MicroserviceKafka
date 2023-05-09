@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Receipt._Domain.Model;
@@ -18,20 +17,21 @@ namespace Receipt.Infrastructure
         }
 
 
-        void IReceiptRepository.CreateReceipt(ReceiptEntity receiptEntity)
+        async Task IReceiptRepository.CreateReceipt(ReceiptEntity receiptEntity)
         {
             Console.WriteLine($"Kvittering er blevet sendt. Kunde CVR: {receiptEntity.Cvr}");
             receiptEntity.State = States.ReceiptDone;
 
             try
             {
-                _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
+                await _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
                 {
                     Key = receiptEntity.Id,
                     Value = JsonConvert.SerializeObject(receiptEntity),
                 });
 
                 _producer.Flush();
+
             }
             catch (Exception e)
             {
