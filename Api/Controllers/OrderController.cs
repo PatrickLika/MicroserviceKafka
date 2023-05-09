@@ -35,8 +35,6 @@ namespace Api.Controllers
                     Value = JsonConvert.SerializeObject(dto)
                 });
 
-                Console.WriteLine(dto);
-
                 _producer.Flush();
                 return Ok();
             }

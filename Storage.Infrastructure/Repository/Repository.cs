@@ -71,9 +71,7 @@ namespace Storage.Infrastructure.Repository
             {
                 Key = key,
                 Value = value
-            });
-
-           
+            }); 
         }
     }
 }
