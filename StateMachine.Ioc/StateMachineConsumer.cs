@@ -101,16 +101,13 @@ namespace StateMachine.Ioc
                             break;
 
                         case var state when state == States.OrderSuccessful:
-                            Console.WriteLine("order færdig med id:" + message.Message.Key);
                             break;
 
                         case var state when state == States.OrderDenied:
                             break;
 
                         default:
-                            Console.WriteLine("Rallan vil gerne ha dansk: Ingen switch case fundet");
-                            Console.WriteLine(message.Message.Value);
-                            Console.WriteLine(message.Message.Key);
+                            ProduceMessageAsync(_configuration["KafkaTopics:DeadLetter"], message.Message.Key, dto);
                             break;
 
                     }
