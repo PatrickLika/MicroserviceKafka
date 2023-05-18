@@ -8,6 +8,6 @@ namespace Receipt.Application.Commands
 {
     public interface IReceiptCreate
     { 
-        Task ReceiptCreate(ReceiptCreateDto dto, string guid); 
+        Task<bool> ReceiptCreate(ReceiptCreateDto dto, string guid); 
     }
 }

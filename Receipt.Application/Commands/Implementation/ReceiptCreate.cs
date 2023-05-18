@@ -17,10 +17,10 @@ namespace Receipt.Application.Commands.Implementation
             _repository = repository;
         }
 
-        async Task IReceiptCreate.ReceiptCreate(ReceiptCreateDto dto, string guid)
+        async Task<bool> IReceiptCreate.ReceiptCreate(ReceiptCreateDto dto, string guid)
         {
             var model = new ReceiptEntity(guid, dto.Screws, dto.Bolts, dto.Nails, dto.Price, dto.Cvr, dto.State, dto.StatePrevious);
-            await _repository.CreateReceipt(model);
+            return await _repository.CreateReceipt(model);
         }
     }
 }

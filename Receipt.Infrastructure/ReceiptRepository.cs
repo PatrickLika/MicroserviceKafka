@@ -17,25 +17,26 @@ namespace Receipt.Infrastructure
         }
 
 
-        async Task IReceiptRepository.CreateReceipt(ReceiptEntity receiptEntity)
+        async Task<bool> IReceiptRepository.CreateReceipt(ReceiptEntity receiptEntity)
         {
             Console.WriteLine($"Kvittering er blevet sendt. Kunde CVR: {receiptEntity.Cvr}");
             receiptEntity.State = States.ReceiptDone;
 
             try
-            {
+            { 
                 await _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
+
                 {
                     Key = receiptEntity.Id,
                     Value = JsonConvert.SerializeObject(receiptEntity),
                 });
 
                 _producer.Flush();
-
+                return true;
             }
-            catch (Exception e)
+            catch
             {
-
+                return false;
             }
 
         }

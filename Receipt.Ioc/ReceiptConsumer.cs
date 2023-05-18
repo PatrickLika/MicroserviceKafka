@@ -36,10 +36,17 @@ namespace Receipt.Ioc
                 if (message != null)
                 {
                     var dto = JsonConvert.DeserializeObject<ReceiptCreateDto>(message.Message.Value);
-                    await _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+
+                    bool isSuccess = await _receiptCreate.ReceiptCreate(dto, message.Message.Key);
+
+                    if (isSuccess)
+                    {
+                        _consumer.Commit(message);
+                    }
                 }
             }
             _consumer.Close();
         }
+
     }
 }
