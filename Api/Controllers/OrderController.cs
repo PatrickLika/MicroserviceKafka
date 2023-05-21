@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text;
+using Order.Application.Commands;
 
 namespace Api.Controllers
 {
@@ -13,12 +14,14 @@ namespace Api.Controllers
         private readonly IProducer<string, string> _producer;
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
+        private readonly IOrderCreate _orderCreate;
 
         public OrderController(IProducer<string, string> producer, IConfiguration configuration,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory, IOrderCreate orderCreate)
         {
             _producer = producer;
             _configuration = configuration;
+            _orderCreate = orderCreate;
             _httpClient = httpClientFactory.CreateClient();
         }
 
@@ -27,20 +30,13 @@ namespace Api.Controllers
         {
             try
             {
-                dto.State = "OrderPending";
-
-                _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
-                {
-                    Key = Guid.NewGuid().ToString(),
-                    Value = JsonConvert.SerializeObject(dto)
-                });
-
-                _producer.Flush();
+                _orderCreate.Create(dto);
                 return Ok();
+
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return BadRequest(e.Message);
+                return BadRequest(ex);
             }
         }
 
@@ -66,36 +62,5 @@ namespace Api.Controllers
             }
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> GetTable()
-        {
-                string query = $"select * from REMAININGSTORAGE;";
-
-                var queryRequest = new
-                {
-                    ksql = query,
-                    streamsProperties = new { }
-                };
-
-                var content = new StringContent(JsonConvert.SerializeObject(queryRequest), Encoding.UTF8, "application/vnd.ksql.v1+json");
-                HttpResponseMessage response = _httpClient.PostAsync($"{_configuration["Kafka:KSqlDB"]}/query", content).Result;
-                string result = response.Content.ReadAsStringAsync().Result;
-
-                JArray jsonResponse = JArray.Parse(result);
-                JObject rowData = (JObject)jsonResponse.FirstOrDefault(x => x["row"] != null);
-                JArray row = rowData != null ? (JArray)rowData["row"]["columns"] : null;
-
-                StorageDbDto values = new StorageDbDto
-                {
-                    Id = row[0].ToObject<string>(),
-                    Screws = row[1].ToObject<int>(),
-                    Bolts = row[2].ToObject<int>(),
-                    Nails = row[3].ToObject<int>()
-                };
-
-                return Ok(values);
-
-        }
     }
 }
