@@ -24,11 +24,24 @@ namespace Order.Infrastructure
             {
                 orderEntity.State = States.OrderPending;
 
-                _producer.ProduceAsync(_configuration["KafkaTopics:OrderReplyChannel"], new Message<string, string>
-                {
-                    Key = Guid.NewGuid().ToString(),
-                    Value = JsonConvert.SerializeObject(orderEntity)
-                });
+                _producer.Produce(_configuration["KafkaTopics:OrderReplyChannel"], 
+                    new Message<string, string>
+                    {
+                        Key = orderEntity.Id,
+                        Value = JsonConvert.SerializeObject(orderEntity)
+                    },
+                    deliveryReport =>
+                    {
+                        if (deliveryReport.Error.IsError)
+                        {
+                            Console.WriteLine($"Failed to deliver message: {deliveryReport.Error.Reason}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Produced event to topic {deliveryReport.Topic}: key = {deliveryReport.Message.Key,-10} value = {deliveryReport.Message.Value}");
+                        }
+                    }
+                );
 
                 _producer.Flush();
             }
