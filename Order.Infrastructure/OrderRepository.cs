@@ -38,7 +38,7 @@ namespace Order.Infrastructure
                         }
                         else
                         {
-                            Console.WriteLine($"Produced event to topic {deliveryReport.Topic}: key = {deliveryReport.Message.Key,-10} value = {deliveryReport.Message.Value}");
+                            Console.WriteLine($"Produced message to topic {deliveryReport.Topic}: key = {deliveryReport.Message.Key,-10} value = {deliveryReport.Message.Value}");
                         }
                     }
                 );
