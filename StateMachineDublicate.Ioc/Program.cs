@@ -28,11 +28,11 @@ var host = Host.CreateDefaultBuilder(args)
             return new ConsumerBuilder<string, string>(config)
                 .SetPartitionsAssignedHandler((_, partitions) =>
                 {
-                    Console.WriteLine($"StateMachineConsumer: Assigned partitions: [{string.Join(", ", partitions)}]");
+                    Console.WriteLine($"StateMachineConsumer: Assigned partitions: {string.Join(", ", partitions)}");
                 })
                 .SetPartitionsRevokedHandler((_, partitions) =>
                 {
-                    Console.WriteLine($"StateMachineConsumer: Revoked partitions: [{string.Join(", ", partitions)}]");
+                    Console.WriteLine($"StateMachineConsumer: Revoked partitions: {string.Join(", ", partitions)}");
                 })
                 .Build();
         });
